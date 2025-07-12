@@ -90,7 +90,7 @@
   </select>
 
   <label for="price">Стоимость товара:</label>
-  <input type="number" id="price" placeholder="не менее 50 000" />
+  <input type="number" id="price" placeholder="не менее 50 000" min="50000" />
 
   <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
   <input type="range" id="months" class="slider" min="3" max="12" value="3" />
@@ -132,6 +132,7 @@
 
       let price = parseInt(priceInput.value);
 
+      // Если пусто или не число
       if (isNaN(price) || price <= 0) {
         resultsDiv.innerHTML = `
           <p><strong>Предоплата:</strong> 0 ₽</p>
@@ -143,7 +144,11 @@
         return;
       }
 
-      if (price < 50000) price = 50000;
+      // Принудительно не менее 50000
+      if (price < 50000) {
+        price = 50000;
+        priceInput.value = 50000;
+      }
 
       const percent = tariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
       let finalCost = price * (1 + percent / 100);
@@ -177,7 +182,13 @@
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
     }
 
-    priceInput.addEventListener('input', updateCalculator);
+    // Обработчики
+    priceInput.addEventListener('input', () => {
+      if (priceInput.value !== '' && parseInt(priceInput.value) < 50000) {
+        priceInput.value = 50000;
+      }
+      updateCalculator();
+    });
     monthsInput.addEventListener('input', updateCalculator);
     tariffInput.addEventListener('change', updateCalculator);
 
