@@ -32,18 +32,21 @@
       display: block;
       margin: 15px 0 5px;
     }
-    input[type="number"] {
-      width: 100%;
-      max-width: 320px;
-      padding: 8px;
+    select, input[type="number"] {
       font-size: 16px;
-      display: block;
-      margin: 0 auto;
+      padding: 8px;
     }
     select {
       width: 100%;
-      padding: 8px;
-      font-size: 16px;
+    }
+    .input-wrapper {
+      width: 100%;
+    }
+    .input-narrow {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      display: block;
     }
     .slider {
       width: 100%;
@@ -57,7 +60,6 @@
       font-size: 14px;
       color: red;
       margin-top: 5px;
-      text-align: center;
       display: none;
     }
     .output {
@@ -110,7 +112,9 @@
   </select>
 
   <label for="price">Стоимость товара:</label>
-  <input type="number" id="price" placeholder="не менее 50 000" min="0" />
+  <div class="input-wrapper">
+    <input type="number" id="price" placeholder="не менее 50 000" min="0" class="input-narrow" />
+  </div>
 
   <div class="error-message" id="errorMessage">Введите значение не менее 50 000₽</div>
 
