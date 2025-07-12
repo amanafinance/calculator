@@ -29,6 +29,11 @@
     .slider {
       width: 100%;
     }
+    .helper-text {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
     .output {
       background-color: #eaf6ec;
       border: 1px solid #c6e2c9;
@@ -56,8 +61,6 @@
     .buttons a.call {
       background-color: #1c7cbd;
     }
-
-    /* 📱➡💻 Адаптивная раскладка кнопок для планшета и ПК */
     @media (min-width: 768px) {
       .buttons {
         flex-direction: row;
@@ -77,16 +80,17 @@
     <option value="without">Без первого взноса</option>
   </select>
 
-  <label for="price">Цена товара (не менее 50 000 ₽):</label>
+  <label for="price">Стоимость товара (не менее 50 000 ₽):</label>
   <input type="number" id="price" value="50000" min="50000" step="100" />
 
   <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
   <input type="range" id="months" class="slider" min="3" max="12" value="3" />
+  <div class="helper-text">Обязательные требования: Поручитель и паспорта обеих лиц</div>
 
   <div class="output" id="results"></div>
 
   <div class="buttons">
-    <a id="whatsapp" href="#" target="_blank">Заявка в WhatsApp</a>
+    <a id="whatsapp" href="#" target="_blank">Написать на WhatsApp</a>
     <a class="call" href="tel:+79280222114">Позвонить</a>
   </div>
 
@@ -113,41 +117,46 @@
     }
 
     function updateCalculator() {
-      const price = Math.max(50000, parseInt(priceInput.value));
-      const months = parseInt(monthsInput.value);
-      const tariff = tariffInput.value;
-
-      monthsValue.textContent = months;
-
-      let monthly = 0, prepayment = 0, finalPrice = 0, markup = 0;
-
-      let percent = (tariff === "with") ? markupWithDown[months] : markupWithoutDown[months];
-      finalPrice = price * (1 + percent / 100);
-
-      if (tariff === "with") {
-        prepayment = roundUpTo100(price * 0.25);
-        const remaining = finalPrice - prepayment;
-        monthly = roundUpTo100(remaining / months);
-      } else {
-        monthly = roundUpTo100(finalPrice / months);
-        prepayment = 0;
+      let price = parseInt(priceInput.value);
+      if (isNaN(price) || price < 50000) {
+        price = 50000;
+        priceInput.value = 50000;
       }
 
-      markup = finalPrice - price;
+      const months = parseInt(monthsInput.value);
+      const tariff = tariffInput.value;
+      monthsValue.textContent = months;
+
+      const percent = tariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
+      let finalCost = price * (1 + percent / 100);
+      let prepayment = 0;
+      let monthly = 0;
+
+      if (tariff === 'with') {
+        prepayment = roundUpTo100(finalCost * 0.25);
+        const remaining = finalCost - prepayment;
+        monthly = roundUpTo100(remaining / months);
+        finalCost = monthly * months + prepayment; // обновлённая логика
+      } else {
+        monthly = roundUpTo100(finalCost / months);
+        finalCost = monthly * months; // обновлённая логика
+      }
+
+      const markup = finalCost - price;
       const markupPercent = Math.round((markup / price) * 100);
 
       let html = '';
-      if (tariff === "with") {
+      if (tariff === 'with') {
         html += `<p><strong>Предоплата:</strong> ${prepayment.toLocaleString()} ₽</p>`;
       }
       html += `<p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>`;
-      html += `<p><strong>Стоимость с наценкой:</strong> ${Math.round(finalPrice).toLocaleString()} ₽</p>`;
-      html += `<p><strong>Наценка:</strong> ${Math.round(markup).toLocaleString()} ₽ (${markupPercent}%)</p>`;
+      html += `<p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>`;
+      html += `<p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>`;
       resultsDiv.innerHTML = html;
 
-      const message = `Здравствуйте! Хочу оформить рассрочку. Цена товара ${price.toLocaleString()} ₽ и кол-во месяцев ${months}.`;
-      const encoded = encodeURIComponent(message);
-      whatsappBtn.href = `https://wa.me/79280222114?text=${encoded}`;
+      const tarifText = tariff === 'with' ? 'С первым взносом' : 'Без первого взноса';
+      const message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: ${tarifText}`;
+      whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
     }
 
     priceInput.addEventListener('input', updateCalculator);
