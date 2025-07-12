@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Калькулятор Amana Finance</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      color: #116234;
+    }
+    label {
+      display: block;
+      margin: 15px 0 5px;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+    }
+    .slider {
+      width: 100%;
+    }
+    .output {
+      background-color: #eaf6ec;
+      border: 1px solid #c6e2c9;
+      padding: 10px;
+      margin-top: 20px;
+    }
+    .output p {
+      margin: 6px 0;
+    }
+    .buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .buttons a {
+      text-align: center;
+      padding: 12px;
+      background-color: #149c46;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    .buttons a.call {
+      background-color: #1c7cbd;
+    }
+
+    /* 📱➡💻 Адаптивная раскладка кнопок для планшета и ПК */
+    @media (min-width: 768px) {
+      .buttons {
+        flex-direction: row;
+      }
+      .buttons a {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Amana Finance</h1>
+
+  <label for="tariff">Тариф:</label>
+  <select id="tariff">
+    <option value="with">С первым взносом</option>
+    <option value="without">Без первого взноса</option>
+  </select>
+
+  <label for="price">Цена товара (не менее 50 000 ₽):</label>
+  <input type="number" id="price" value="50000" min="50000" step="100" />
+
+  <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
+  <input type="range" id="months" class="slider" min="3" max="12" value="3" />
+
+  <div class="output" id="results"></div>
+
+  <div class="buttons">
+    <a id="whatsapp" href="#" target="_blank">Заявка в WhatsApp</a>
+    <a class="call" href="tel:+79280222114">Позвонить</a>
+  </div>
+
+  <script>
+    const priceInput = document.getElementById('price');
+    const monthsInput = document.getElementById('months');
+    const monthsValue = document.getElementById('monthsValue');
+    const tariffInput = document.getElementById('tariff');
+    const resultsDiv = document.getElementById('results');
+    const whatsappBtn = document.getElementById('whatsapp');
+
+    const markupWithDown = {
+      3: 9, 4: 12, 5: 15, 6: 18,
+      7: 20, 8: 22, 9: 24, 10: 26, 11: 28, 12: 30
+    };
+
+    const markupWithoutDown = {
+      3: 14, 4: 18, 5: 23, 6: 28,
+      7: 31, 8: 33, 9: 37, 10: 40, 11: 43, 12: 46
+    };
+
+    function roundUpTo100(val) {
+      return Math.ceil(val / 100) * 100;
+    }
+
+    function updateCalculator() {
+      const price = Math.max(50000, parseInt(priceInput.value));
+      const months = parseInt(monthsInput.value);
+      const tariff = tariffInput.value;
+
+      monthsValue.textContent = months;
+
+      let monthly = 0, prepayment = 0, finalPrice = 0, markup = 0;
+
+      let percent = (tariff === "with") ? markupWithDown[months] : markupWithoutDown[months];
+      finalPrice = price * (1 + percent / 100);
+
+      if (tariff === "with") {
+        prepayment = roundUpTo100(price * 0.25);
+        const remaining = finalPrice - prepayment;
+        monthly = roundUpTo100(remaining / months);
+      } else {
+        monthly = roundUpTo100(finalPrice / months);
+        prepayment = 0;
+      }
+
+      markup = finalPrice - price;
+      const markupPercent = Math.round((markup / price) * 100);
+
+      let html = '';
+      if (tariff === "with") {
+        html += `<p><strong>Предоплата:</strong> ${prepayment.toLocaleString()} ₽</p>`;
+      }
+      html += `<p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>`;
+      html += `<p><strong>Стоимость с наценкой:</strong> ${Math.round(finalPrice).toLocaleString()} ₽</p>`;
+      html += `<p><strong>Наценка:</strong> ${Math.round(markup).toLocaleString()} ₽ (${markupPercent}%)</p>`;
+      resultsDiv.innerHTML = html;
+
+      const message = `Здравствуйте! Хочу оформить рассрочку. Цена товара ${price.toLocaleString()} ₽ и кол-во месяцев ${months}.`;
+      const encoded = encodeURIComponent(message);
+      whatsappBtn.href = `https://wa.me/79280222114?text=${encoded}`;
+    }
+
+    priceInput.addEventListener('input', updateCalculator);
+    monthsInput.addEventListener('input', updateCalculator);
+    tariffInput.addEventListener('change', updateCalculator);
+
+    updateCalculator();
+  </script>
+</body>
+</html>
