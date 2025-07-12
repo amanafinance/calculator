@@ -13,11 +13,20 @@
       margin: auto;
       color: #222;
     }
-    h1, h2 {
+    .header {
       text-align: center;
-      color: #116234;
+      margin-bottom: 20px;
+    }
+    .header .title {
       font-size: 24px;
-      margin: 5px 0;
+      font-weight: bold;
+      color: #116234;
+      margin-bottom: 5px;
+    }
+    .header .subtitle {
+      font-size: 24px;
+      font-weight: normal;
+      color: #222;
     }
     label {
       display: block;
@@ -35,6 +44,12 @@
       font-size: 13px;
       color: red;
       margin-top: 4px;
+    }
+    .error-message {
+      font-size: 14px;
+      color: red;
+      margin-top: 5px;
+      display: none;
     }
     .output {
       background-color: #eaf6ec;
@@ -74,8 +89,10 @@
   </style>
 </head>
 <body>
-  <h1>Amana Finance</h1>
-  <h2>Калькулятор рассрочки</h2>
+  <div class="header">
+    <div class="title">Amana Finance</div>
+    <div class="subtitle">Калькулятор рассрочки</div>
+  </div>
 
   <label for="tariff">Тариф:</label>
   <select id="tariff">
@@ -84,7 +101,9 @@
   </select>
 
   <label for="price">Стоимость товара:</label>
-  <input type="number" id="price" placeholder="не менее 50 000" min="50000" oninput="this.value = this.value.replace(/^0+/, '')" />
+  <input type="number" id="price" placeholder="не менее 50 000" min="0" />
+
+  <div class="error-message" id="errorMessage">Введите значение больше 50 000₽</div>
 
   <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
   <input type="range" id="months" class="slider" min="3" max="12" value="3" />
@@ -104,6 +123,7 @@
     const tariffInput = document.getElementById('tariff');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
+    const errorMessage = document.getElementById('errorMessage');
 
     const markupWithDown = {
       3: 9, 4: 12, 5: 15, 6: 18,
@@ -126,7 +146,8 @@
 
       let price = parseInt(priceInput.value);
 
-      if (isNaN(price) || price <= 0) {
+      if (isNaN(price) || price < 50000) {
+        errorMessage.style.display = 'block';
         resultsDiv.innerHTML = `
           <p><strong>Предоплата:</strong> 0 ₽</p>
           <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
@@ -135,11 +156,8 @@
         `;
         whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent("Здравствуйте, хочу оформить рассрочку.")}`;
         return;
-      }
-
-      if (price < 50000) {
-        price = 50000;
-        priceInput.value = 50000;
+      } else {
+        errorMessage.style.display = 'none';
       }
 
       const percent = tariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
@@ -174,13 +192,7 @@
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
     }
 
-    // Обработчики
-    priceInput.addEventListener('input', () => {
-      if (priceInput.value !== '' && parseInt(priceInput.value) < 50000) {
-        priceInput.value = 50000;
-      }
-      updateCalculator();
-    });
+    priceInput.addEventListener('input', updateCalculator);
     monthsInput.addEventListener('input', updateCalculator);
     tariffInput.addEventListener('change', updateCalculator);
 
