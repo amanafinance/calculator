@@ -16,6 +16,14 @@
     h1 {
       text-align: center;
       color: #116234;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      text-align: center;
+      color: #000;
+      margin-top: 0;
+      font-size: 26px;
     }
     label {
       display: block;
@@ -31,7 +39,7 @@
     }
     .helper-text {
       font-size: 13px;
-      color: #666;
+      color: red;
       margin-top: 4px;
     }
     .output {
@@ -73,6 +81,7 @@
 </head>
 <body>
   <h1>Amana Finance</h1>
+  <h2>Калькулятор рассрочки</h2>
 
   <label for="tariff">Тариф:</label>
   <select id="tariff">
@@ -80,8 +89,8 @@
     <option value="without">Без первого взноса</option>
   </select>
 
-  <label for="price">Стоимость товара (не менее 50 000 ₽):</label>
-  <input type="number" id="price" value="50000" min="50000" step="100" />
+  <label for="price">Стоимость товара:</label>
+  <input type="number" id="price" placeholder="не менее 50 000" />
 
   <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
   <input type="range" id="months" class="slider" min="3" max="12" value="3" />
@@ -117,15 +126,24 @@
     }
 
     function updateCalculator() {
-      let price = parseInt(priceInput.value);
-      if (isNaN(price) || price < 50000) {
-        price = 50000;
-        priceInput.value = 50000;
-      }
-
       const months = parseInt(monthsInput.value);
       const tariff = tariffInput.value;
       monthsValue.textContent = months;
+
+      let price = parseInt(priceInput.value);
+
+      if (isNaN(price) || price <= 0) {
+        resultsDiv.innerHTML = `
+          <p><strong>Предоплата:</strong> 0 ₽</p>
+          <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
+          <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
+          <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
+        `;
+        whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent("Здравствуйте, хочу оформить рассрочку.")}`;
+        return;
+      }
+
+      if (price < 50000) price = 50000;
 
       const percent = tariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
       let finalCost = price * (1 + percent / 100);
@@ -136,10 +154,10 @@
         prepayment = roundUpTo100(finalCost * 0.25);
         const remaining = finalCost - prepayment;
         monthly = roundUpTo100(remaining / months);
-        finalCost = monthly * months + prepayment; // обновлённая логика
+        finalCost = monthly * months + prepayment;
       } else {
         monthly = roundUpTo100(finalCost / months);
-        finalCost = monthly * months; // обновлённая логика
+        finalCost = monthly * months;
       }
 
       const markup = finalCost - price;
