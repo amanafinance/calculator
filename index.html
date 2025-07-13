@@ -18,7 +18,7 @@
       margin-bottom: 20px;
     }
     .header .title {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: bold;
       color: #116234;
       margin-bottom: 5px;
@@ -27,6 +27,7 @@
       font-size: 24px;
       font-weight: normal;
       color: #222;
+      text-transform: uppercase;
     }
     label {
       display: block;
@@ -102,7 +103,7 @@
 <body>
   <div class="header">
     <div class="title">Amana Finance</div>
-    <div class="subtitle">Калькулятор рассрочки</div>
+    <div class="subtitle">КАЛЬКУЛЯТОР РАССРОЧКИ</div>
   </div>
 
   <label for="tariff">Тариф:</label>
@@ -162,7 +163,7 @@
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
         resultsDiv.innerHTML = `
-          <p><strong>Предоплата:</strong> 0 ₽</p>
+          <p><strong>Первый взнос:</strong> 0 ₽</p>
           <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
           <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
           <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
@@ -193,7 +194,7 @@
 
       let html = '';
       if (tariff === 'with') {
-        html += `<p><strong>Предоплата:</strong> ${prepayment.toLocaleString()} ₽</p>`;
+        html += `<p><strong>Первый взнос:</strong> ${prepayment.toLocaleString()} ₽</p>`;
       }
       html += `<p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>`;
       html += `<p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>`;
