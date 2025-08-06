@@ -48,6 +48,10 @@
       font-size: 15px; padding: 9px; width: 97%;
       border: 1px solid #ccc; border-radius: 7px;
     }
+    .slider-container {
+      position: relative;
+      width: 100%;
+    }
     .slider {
       width: 100%; margin-top: 5px; appearance: none;
       height: 6px; background: #ddd; border-radius: 5px;
@@ -55,6 +59,14 @@
     .slider::-webkit-slider-thumb {
       appearance: none; width: 18px; height: 18px;
       background: #95C11F; border-radius: 50%; cursor: pointer; border: 2px solid white;
+    }
+    .marker {
+      position: absolute;
+      top: 20px; /* чуть ниже ползунка */
+      width: 2px;
+      height: 12px;
+      background: #116234;
+      transform: translateX(-50%);
     }
     .error-message, .helper-text {
       font-size: 12.5px; color: #a94442; background: #fdecea;
@@ -104,7 +116,10 @@
 
     <div id="prepaymentBlock">
       <label for="prepaymentSlider">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
-      <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
+      <div class="slider-container">
+        <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
+        <div id="marker" class="marker"></div>
+      </div>
     </div>
 
     <div class="output" id="results"></div>
@@ -124,6 +139,7 @@
     const prepaymentBlock = document.getElementById('prepaymentBlock');
     const prepaymentSlider = document.getElementById('prepaymentSlider');
     const prepaymentLabel = document.getElementById('prepaymentLabel');
+    const marker = document.getElementById('marker');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
@@ -137,6 +153,18 @@
 
     function roundUpTo100(val) {
       return Math.ceil(val / 100) * 100;
+    }
+
+    function updateMarker() {
+      const min = parseInt(prepaymentSlider.min);
+      const max = parseInt(prepaymentSlider.max);
+      if (max > min) {
+        const percent = (conditionalPrepayment - min) / (max - min);
+        marker.style.left = `${percent * 100}%`;
+        marker.style.display = 'block';
+      } else {
+        marker.style.display = 'none';
+      }
     }
 
     function togglePrepaymentSlider() {
@@ -157,6 +185,7 @@
           <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
         `;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
+        marker.style.display = 'none';
         return;
       } else {
         errorMessage.style.display = 'none';
@@ -180,7 +209,7 @@
           prepaymentSlider.value = conditionalPrepayment;
         }
 
-        // магнит
+        // магнит к условному значению
         if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 500) {
           prepaymentSlider.value = conditionalPrepayment;
         }
@@ -200,10 +229,13 @@
         }
 
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
+
+        updateMarker();
       } else {
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
         prepaymentLabel.textContent = "—";
+        marker.style.display = 'none';
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
@@ -237,5 +269,4 @@
   </script>
 </body>
 </html>
-
 
