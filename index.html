@@ -8,96 +8,79 @@
   <style>
     body {
       font-family: 'Manrope', sans-serif;
-      background-color: #f2f2f2;
+      background: #f2f2f2;
       margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: start;
       min-height: 100vh;
+      padding: 10px;
     }
-
     .calculator {
       width: 100%;
-      max-width: 460px;
-      background: rgba(255, 255, 255, 0.75);
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(149, 193, 31, 0.2);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
       border-radius: 18px;
-      padding: 16px 16px 20px;
-      box-sizing: border-box;
-      margin: 8px;
+      padding: 18px;
+      margin: 12px;
     }
-
     .header {
       text-align: center;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
-
     .header .title {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 800;
       color: #116234;
       text-transform: uppercase;
       margin-bottom: 2px;
     }
-
     .header .subtitle {
-      font-size: 13.5px;
+      font-size: 14px;
       color: #555;
       letter-spacing: 1px;
       text-transform: uppercase;
       font-weight: 500;
-      margin-top: -2px;
     }
-
     .tariff-buttons {
       display: flex;
-      justify-content: space-between;
       gap: 8px;
       margin: 12px 0;
     }
-
     .tariff-button {
       flex: 1;
-      padding: 8px 5px;
-      background-color: #f4f4f4;
+      padding: 8px;
+      background: #f4f4f4;
       border: 1px solid #ccc;
       border-radius: 7px;
       cursor: pointer;
       text-align: center;
       font-weight: 500;
       font-size: 13.5px;
+      transition: .3s;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: all 0.3s ease;
     }
-
     .tariff-button.active {
-      background-color: #95C11F;
+      background: #95C11F;
       color: #fff;
       border-color: #116234;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
-
     label {
       display: block;
       margin: 10px 0 5px;
       font-weight: 600;
       font-size: 13.5px;
     }
-
     input[type="number"] {
       font-size: 15px;
       padding: 9px;
-      width: 100%;
+      width: 92%;
       border: 1px solid #ccc;
       border-radius: 7px;
-      box-sizing: border-box;
     }
-
     .slider {
       width: 100%;
       margin-top: 5px;
@@ -105,9 +88,7 @@
       height: 6px;
       background: #ddd;
       border-radius: 5px;
-      position: relative;
     }
-
     .slider::-webkit-slider-thumb {
       appearance: none;
       width: 18px;
@@ -116,92 +97,58 @@
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     }
-
-    .slider::before,
-    .slider::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      width: 10px;
-      height: 10px;
-      background: transparent;
-      border-radius: 50%;
-      transform: translateY(-50%);
-    }
-
-    .slider::before {
-      left: -10px;
-    }
-
-    .slider::after {
-      right: -10px;
-    }
-
     .error-message, .helper-text {
       font-size: 12.5px;
       color: #a94442;
-      background-color: #fdecea;
+      background: #fdecea;
       border: 1px solid #f5c6cb;
       padding: 8px;
       margin-top: 10px;
       border-radius: 6px;
     }
-
     .error-message {
       display: none;
     }
-
     .output {
-      background-color: #eaf6ec;
+      background: #eaf6ec;
       border: 1px solid #c6e2c9;
       padding: 10px;
       margin-top: 16px;
       border-radius: 8px;
       font-size: 14px;
     }
-
     .output p {
       margin: 5px 0;
     }
-
     .buttons {
       margin-top: 18px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-
     .buttons a {
       text-align: center;
       padding: 12px;
-      background-color: #95C11F;
+      background: #95C11F;
       color: white;
-      text-decoration: none;
       font-weight: 600;
       border-radius: 8px;
-      transition: all 0.3s ease;
+      transition: .3s;
       font-size: 14px;
+      text-decoration: none;
     }
-
     .buttons a.call {
-      background-color: #115C30;
+      background: #115C30;
     }
-
     .buttons a:hover {
       transform: scale(1.015);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     }
-
-    @media (min-width: 768px) {
-      .buttons {
-        flex-direction: row;
-      }
-
-      .buttons a {
-        flex: 1;
-      }
+    @media(min-width:768px){
+      body {padding: 30px;}
+      .calculator {max-width: 560px; padding: 24px;}
+      .buttons {flex-direction: row;}
+      .buttons a {flex: 1;}
     }
   </style>
 </head>
@@ -225,6 +172,11 @@
     <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
     <input type="range" id="months" class="slider" min="3" max="12" value="3" />
 
+    <div id="prepaymentBlock">
+      <label for="prepaymentSlider">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
+      <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
+    </div>
+
     <div class="output" id="results"></div>
 
     <div class="helper-text">Обязательные требования: Поручитель и паспорта обеих лиц</div>
@@ -239,6 +191,9 @@
     const priceInput = document.getElementById('price');
     const monthsInput = document.getElementById('months');
     const monthsValue = document.getElementById('monthsValue');
+    const prepaymentBlock = document.getElementById('prepaymentBlock');
+    const prepaymentSlider = document.getElementById('prepaymentSlider');
+    const prepaymentLabel = document.getElementById('prepaymentLabel');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
@@ -246,70 +201,87 @@
 
     let selectedTariff = 'with';
 
-    const markupWithDown = {
-      3: 9, 4: 12, 5: 15, 6: 18,
-      7: 20, 8: 22, 9: 24, 10: 26, 11: 28, 12: 30
-    };
-
-    const markupWithoutDown = {
-      3: 14, 4: 18, 5: 23, 6: 28,
-      7: 31, 8: 33, 9: 37, 10: 40, 11: 43, 12: 46
-    };
+    const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
+    const markupWithoutDown = {3:14,4:18,5:23,6:28,7:31,8:33,9:37,10:40,11:43,12:46};
 
     function roundUpTo100(val) {
       return Math.ceil(val / 100) * 100;
     }
 
-    function updateCalculator() {
+    function togglePrepaymentSlider() {
+      prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
+    }
+
+    function updateCalculator(resetPrepayment = false) {
       const months = parseInt(monthsInput.value);
       monthsValue.textContent = months;
 
       let price = parseInt(priceInput.value);
-
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
+        prepaymentLabel.textContent = "0 ₽";
         resultsDiv.innerHTML = `
-          <p><strong>Первый взнос:</strong> 0 ₽</p>
           <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
           <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
           <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
         `;
-        whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent("Здравствуйте, хочу оформить рассрочку.")}`;
+        whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         return;
       } else {
         errorMessage.style.display = 'none';
       }
 
-      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      let finalCost = price * (1 + percent / 100);
-      let prepayment = 0;
-      let monthly = 0;
+      let percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
+      let baseFinalCost = price * (1 + percent / 100);
+
+      let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
-        prepayment = roundUpTo100(finalCost * 0.25);
-        const remaining = finalCost - prepayment;
-        monthly = roundUpTo100(remaining / months);
-        finalCost = monthly * months + prepayment;
+        const minPrepayment = roundUpTo100(baseFinalCost * 0.1);
+        const maxPrepayment = roundUpTo100(baseFinalCost * 0.6);
+
+        prepaymentSlider.min = minPrepayment;
+        prepaymentSlider.max = maxPrepayment;
+
+        if (resetPrepayment) {
+          prepaymentSlider.value = roundUpTo100(baseFinalCost * 0.25);
+        }
+
+        prepayment = parseInt(prepaymentSlider.value);
+        prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
+
+        const conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
+
+        if (prepayment === conditionalPrepayment) {
+          const remaining = baseFinalCost - prepayment;
+          monthly = roundUpTo100(remaining / months);
+          finalCost = monthly * months + prepayment;
+        } else {
+          const remaining = price - prepayment;
+          const remainingWithMarkup = remaining * (1 + markupWithoutDown[months] / 100);
+          monthly = roundUpTo100(remainingWithMarkup / months);
+          finalCost = monthly * months + prepayment;
+        }
+
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
       } else {
-        monthly = roundUpTo100(finalCost / months);
+        monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
+        prepaymentLabel.textContent = "—";
+        message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
       const markup = finalCost - price;
       const markupPercent = Math.round((markup / price) * 100);
 
-      let html = '';
-      if (selectedTariff === 'with') {
-        html += `<p><strong>Первый взнос:</strong> ${prepayment.toLocaleString()} ₽</p>`;
-      }
-      html += `<p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>`;
-      html += `<p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>`;
-      html += `<p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>`;
-      resultsDiv.innerHTML = html;
+      resultsDiv.innerHTML = `
+        <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
+        <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
+        <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
+      `;
 
-      const tarifText = selectedTariff === 'with' ? 'С первым взносом' : 'Без первого взноса';
-      const message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: ${tarifText}`;
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+      togglePrepaymentSlider();
     }
 
     tariffButtons.forEach(button => {
@@ -317,14 +289,15 @@
         tariffButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
         selectedTariff = button.dataset.tariff;
-        updateCalculator();
+        updateCalculator(true);
       });
     });
 
-    priceInput.addEventListener('input', updateCalculator);
-    monthsInput.addEventListener('input', updateCalculator);
+    priceInput.addEventListener('input', () => updateCalculator(true));
+    monthsInput.addEventListener('input', () => updateCalculator(true));
+    prepaymentSlider.addEventListener('input', () => updateCalculator(false));
 
-    updateCalculator();
+    updateCalculator(true);
   </script>
 </body>
 </html>
