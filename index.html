@@ -60,16 +60,16 @@
       appearance: none; width: 18px; height: 18px;
       background: #95C11F; border-radius: 50%; cursor: pointer; border: 2px solid white;
     }
-    /* Треугольный маркер */
+    /* жирная точка для условного взноса */
     .marker {
       position: absolute;
-      top: -10px;
-      width: 0;
-      height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-bottom: 10px solid #116234;
+      top: -4px;
+      width: 14px;
+      height: 14px;
+      background: #116234;
+      border-radius: 50%;
       transform: translateX(-50%);
+      pointer-events: none;
     }
     .error-message, .helper-text {
       font-size: 12.5px; color: #a94442; background: #fdecea;
@@ -94,6 +94,14 @@
       .calculator { max-width: 560px; padding: 24px; }
       .buttons { flex-direction: row; }
       .buttons a { flex: 1; }
+    }
+    .manual-input {
+      margin-top: 6px;
+      width: 97%;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -123,6 +131,7 @@
         <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
         <div id="marker" class="marker"></div>
       </div>
+      <input type="number" id="manualPrepayment" class="manual-input" placeholder="Введите сумму вручную" />
     </div>
 
     <div class="output" id="results"></div>
@@ -141,6 +150,7 @@
     const monthsValue = document.getElementById('monthsValue');
     const prepaymentBlock = document.getElementById('prepaymentBlock');
     const prepaymentSlider = document.getElementById('prepaymentSlider');
+    const manualPrepayment = document.getElementById('manualPrepayment');
     const prepaymentLabel = document.getElementById('prepaymentLabel');
     const marker = document.getElementById('marker');
     const resultsDiv = document.getElementById('results');
@@ -205,21 +215,23 @@
 
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
-        prepaymentSlider.step = 100; // шаг 100 рублей
+        prepaymentSlider.step = 100;
 
         conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
 
         if (resetPrepayment) {
           prepaymentSlider.value = conditionalPrepayment;
+          manualPrepayment.value = conditionalPrepayment;
         }
 
-        // магнит к условному значению
         if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 500) {
           prepaymentSlider.value = conditionalPrepayment;
+          manualPrepayment.value = conditionalPrepayment;
         }
 
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
+        manualPrepayment.value = prepayment;
 
         if (prepayment === conditionalPrepayment) {
           const remaining = baseFinalCost - prepayment;
@@ -240,6 +252,7 @@
         finalCost = monthly * months;
         prepaymentLabel.textContent = "—";
         marker.style.display = 'none';
+        manualPrepayment.value = "";
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
@@ -268,6 +281,13 @@
     priceInput.addEventListener('input', () => updateCalculator(true));
     monthsInput.addEventListener('input', () => updateCalculator(true));
     prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+    manualPrepayment.addEventListener('input', () => {
+      let val = roundUpTo100(parseInt(manualPrepayment.value) || 0);
+      if (val >= prepaymentSlider.min && val <= prepaymentSlider.max) {
+        prepaymentSlider.value = val;
+        updateCalculator(false);
+      }
+    });
 
     updateCalculator(true);
   </script>
