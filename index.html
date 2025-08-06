@@ -77,7 +77,7 @@
     input[type="number"] {
       font-size: 15px;
       padding: 9px;
-      width: 95%;
+      width: 97%;
       border: 1px solid #ccc;
       border-radius: 7px;
     }
@@ -237,8 +237,9 @@
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
-        const minPrepayment = roundUpTo100(baseFinalCost * 0.1);
-        const maxPrepayment = roundUpTo100(baseFinalCost * 0.6);
+        // диапазон 15–50% от baseFinalCost
+        const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
+        const maxPrepayment = roundUpTo100(baseFinalCost * 0.5);
 
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
@@ -301,3 +302,4 @@
   </script>
 </body>
 </html>
+
