@@ -60,12 +60,15 @@
       appearance: none; width: 18px; height: 18px;
       background: #95C11F; border-radius: 50%; cursor: pointer; border: 2px solid white;
     }
+    /* Треугольный маркер */
     .marker {
       position: absolute;
-      top: 20px; /* чуть ниже ползунка */
-      width: 2px;
-      height: 12px;
-      background: #116234;
+      top: -10px;
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 10px solid #116234;
       transform: translateX(-50%);
     }
     .error-message, .helper-text {
@@ -202,6 +205,7 @@
 
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
+        prepaymentSlider.step = 100; // шаг 100 рублей
 
         conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
 
@@ -269,4 +273,3 @@
   </script>
 </body>
 </html>
-
