@@ -104,8 +104,7 @@
 
     <div id="prepaymentBlock">
       <label for="prepaymentSlider">Первый взнос:
-        <input type="number" id="prepaymentInput" step="100"
-               style="width: 120px; font-weight: bold; font-size: 14px; margin-left: 8px;" />
+        <input type="number" id="prepaymentInput" step="100" style="width: 120px; font-weight: bold; font-size: 14px; margin-left: 8px;" />
       </label>
       <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
     </div>
@@ -138,27 +137,22 @@
     const markupWithDown = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
     const markupWithoutDown = {3:14,4:18,5:23,6:28,7:31,8:33,9:37,10:40,11:43,12:46};
 
-    function roundUpTo100(val) {
-      return Math.ceil(val / 100) * 100;
-    }
+    const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
-    function togglePrepaymentSlider() {
+    const togglePrepaymentSlider = () => {
       prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
-    }
+    };
 
-    function updateCalculator(resetPrepayment = false) {
+    const updateCalculator = (resetPrepayment = false) => {
       const months = parseInt(monthsInput.value);
       monthsValue.textContent = months;
 
-      let price = parseInt(priceInput.value);
+      const price = parseInt(priceInput.value);
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
+        errorMessage.textContent = 'Стоимость товара должно быть не менее 50 000₽';
         prepaymentInput.value = 0;
-        resultsDiv.innerHTML = `
-          <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
-          <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
-          <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
-        `;
+        resultsDiv.innerHTML = `<p><strong>Ежемесячный платёж:</strong> 0 ₽</p><p><strong>Стоимость с наценкой:</strong> 0 ₽</p><p><strong>Наценка:</strong> 0 ₽ (0%)</p>`;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
         return;
@@ -179,13 +173,9 @@
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
 
-        if (resetPrepayment) {
-          prepaymentSlider.value = conditionalPrepayment;
-        }
+        if (resetPrepayment) prepaymentSlider.value = conditionalPrepayment;
 
-        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 1500) {
-          prepaymentSlider.value = conditionalPrepayment;
-        }
+        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 1500) prepaymentSlider.value = conditionalPrepayment;
 
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentInput.value = prepayment;
@@ -202,6 +192,7 @@
         }
 
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: С первым взносом, Первый взнос: ${prepayment.toLocaleString()} ₽, Срок: ${months} мес.`;
+
       } else {
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
@@ -220,7 +211,7 @@
 
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
       togglePrepaymentSlider();
-    }
+    };
 
     tariffButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -241,8 +232,12 @@
       const max = parseInt(prepaymentSlider.max);
 
       if (val >= min && val <= max) {
+        errorMessage.style.display = 'none';
         prepaymentSlider.value = val;
         updateCalculator(false);
+      } else {
+        errorMessage.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
+        errorMessage.style.display = 'block';
       }
     });
 
