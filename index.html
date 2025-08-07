@@ -96,7 +96,6 @@
 
     <label for="price">Стоимость товара:</label>
     <input type="number" id="price" placeholder="не менее 50 000" min="0" />
-
     <div class="error-message" id="errorMessage">Стоимость товара должно быть не менее 50 000₽</div>
 
     <label for="months">Кол-во месяцев: <span id="monthsValue">3</span></label>
@@ -104,8 +103,10 @@
 
     <div id="prepaymentBlock">
       <label for="prepaymentSlider">Первый взнос:
-        <input type="number" id="prepaymentInput" step="100" style="width: 120px; font-weight: bold; font-size: 14px; margin-left: 8px;" />
+        <input type="number" id="prepaymentInput" step="100"
+               style="width: 120px; font-weight: bold; font-size: 14px; margin-left: 8px;" />
       </label>
+      <div class="error-message" id="prepaymentError" style="display: none;"></div>
       <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
     </div>
 
@@ -126,6 +127,7 @@
     const prepaymentBlock = document.getElementById('prepaymentBlock');
     const prepaymentSlider = document.getElementById('prepaymentSlider');
     const prepaymentInput = document.getElementById('prepaymentInput');
+    const prepaymentError = document.getElementById('prepaymentError');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
@@ -139,11 +141,11 @@
 
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
-    const togglePrepaymentSlider = () => {
+    function togglePrepaymentSlider() {
       prepaymentBlock.style.display = selectedTariff === 'with' ? 'block' : 'none';
-    };
+    }
 
-    const updateCalculator = (resetPrepayment = false) => {
+    function updateCalculator(resetPrepayment = false) {
       const months = parseInt(monthsInput.value);
       monthsValue.textContent = months;
 
@@ -152,6 +154,7 @@
         errorMessage.style.display = 'block';
         errorMessage.textContent = 'Стоимость товара должно быть не менее 50 000₽';
         prepaymentInput.value = 0;
+        prepaymentError.style.display = 'none';
         resultsDiv.innerHTML = `<p><strong>Ежемесячный платёж:</strong> 0 ₽</p><p><strong>Стоимость с наценкой:</strong> 0 ₽</p><p><strong>Наценка:</strong> 0 ₽ (0%)</p>`;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
@@ -173,9 +176,13 @@
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
 
-        if (resetPrepayment) prepaymentSlider.value = conditionalPrepayment;
+        if (resetPrepayment) {
+          prepaymentSlider.value = conditionalPrepayment;
+        }
 
-        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 1500) prepaymentSlider.value = conditionalPrepayment;
+        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 1500) {
+          prepaymentSlider.value = conditionalPrepayment;
+        }
 
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentInput.value = prepayment;
@@ -210,8 +217,9 @@
       `;
 
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(message)}`;
+      prepaymentError.style.display = 'none';
       togglePrepaymentSlider();
-    };
+    }
 
     tariffButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -232,12 +240,12 @@
       const max = parseInt(prepaymentSlider.max);
 
       if (val >= min && val <= max) {
-        errorMessage.style.display = 'none';
+        prepaymentError.style.display = 'none';
         prepaymentSlider.value = val;
         updateCalculator(false);
       } else {
-        errorMessage.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
-        errorMessage.style.display = 'block';
+        prepaymentError.textContent = `Первый взнос должен быть от ${min.toLocaleString()}₽ до ${max.toLocaleString()}₽`;
+        prepaymentError.style.display = 'block';
       }
     });
 
