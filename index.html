@@ -103,7 +103,10 @@
     <input type="range" id="months" class="slider" min="3" max="12" value="3" />
 
     <div id="prepaymentBlock">
-      <label for="prepaymentSlider">Первый взнос: <span id="prepaymentLabel">0 ₽</span></label>
+      <label for="prepaymentSlider">Первый взнос:
+        <input type="number" id="prepaymentInput" step="100"
+               style="width: 120px; font-weight: bold; font-size: 14px; margin-left: 8px;" />
+      </label>
       <input type="range" id="prepaymentSlider" class="slider" min="0" max="0" step="100" value="0" />
     </div>
 
@@ -123,7 +126,7 @@
     const monthsValue = document.getElementById('monthsValue');
     const prepaymentBlock = document.getElementById('prepaymentBlock');
     const prepaymentSlider = document.getElementById('prepaymentSlider');
-    const prepaymentLabel = document.getElementById('prepaymentLabel');
+    const prepaymentInput = document.getElementById('prepaymentInput');
     const resultsDiv = document.getElementById('results');
     const whatsappBtn = document.getElementById('whatsapp');
     const errorMessage = document.getElementById('errorMessage');
@@ -150,7 +153,7 @@
       let price = parseInt(priceInput.value);
       if (isNaN(price) || price < 50000) {
         errorMessage.style.display = 'block';
-        prepaymentLabel.textContent = "0 ₽";
+        prepaymentInput.value = 0;
         resultsDiv.innerHTML = `
           <p><strong>Ежемесячный платёж:</strong> 0 ₽</p>
           <p><strong>Стоимость с наценкой:</strong> 0 ₽</p>
@@ -163,19 +166,18 @@
         errorMessage.style.display = 'none';
       }
 
-      let percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
-      let baseFinalCost = price * (1 + percent / 100);
+      const percent = selectedTariff === 'with' ? markupWithDown[months] : markupWithoutDown[months];
+      const baseFinalCost = price * (1 + percent / 100);
 
       let prepayment = 0, monthly = 0, finalCost = 0, message = "";
 
       if (selectedTariff === 'with') {
         const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
         const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
+        conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
 
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
-
-        conditionalPrepayment = roundUpTo100(baseFinalCost * 0.25);
 
         if (resetPrepayment) {
           prepaymentSlider.value = conditionalPrepayment;
@@ -186,7 +188,7 @@
         }
 
         prepayment = parseInt(prepaymentSlider.value);
-        prepaymentLabel.textContent = `${prepayment.toLocaleString()} ₽`;
+        prepaymentInput.value = prepayment;
 
         if (prepayment === conditionalPrepayment) {
           const remaining = baseFinalCost - prepayment;
@@ -203,7 +205,7 @@
       } else {
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
-        prepaymentLabel.textContent = "—";
+        prepaymentInput.value = "—";
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
@@ -232,6 +234,17 @@
     priceInput.addEventListener('input', () => updateCalculator(true));
     monthsInput.addEventListener('input', () => updateCalculator(true));
     prepaymentSlider.addEventListener('input', () => updateCalculator(false));
+
+    prepaymentInput.addEventListener('input', () => {
+      const val = roundUpTo100(parseInt(prepaymentInput.value || '0'));
+      const min = parseInt(prepaymentSlider.min);
+      const max = parseInt(prepaymentSlider.max);
+
+      if (val >= min && val <= max) {
+        prepaymentSlider.value = val;
+        updateCalculator(false);
+      }
+    });
 
     updateCalculator(true);
   </script>
