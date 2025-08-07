@@ -155,7 +155,7 @@
         errorMessage.textContent = 'Стоимость товара должно быть не менее 50 000₽';
         prepaymentInput.value = 0;
         prepaymentError.style.display = 'none';
-        resultsDiv.innerHTML = `<p><strong>Первый взнос:</strong> —</p><p><strong>Ежемесячный платёж:</strong> 0 ₽</p><p><strong>Стоимость с наценкой:</strong> 0 ₽</p><p><strong>Наценка:</strong> 0 ₽ (0%)</p>`;
+        resultsDiv.innerHTML = `<p><strong>Первый взнос:</strong> 0 ₽</p><p><strong>Ежемесячный платёж:</strong> 0 ₽</p><p><strong>Стоимость с наценкой:</strong> 0 ₽</p><p><strong>Наценка:</strong> 0 ₽ (0%)</p>`;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
         return;
@@ -203,7 +203,8 @@
       } else {
         monthly = roundUpTo100(baseFinalCost / months);
         finalCost = monthly * months;
-        prepaymentInput.value = "—";
+        prepaymentInput.value = "0";
+        prepayment = 0;
         message = `Здравствуйте, хочу оформить рассрочку. Стоимость товара: ${price.toLocaleString()} ₽, Тариф: Без первого взноса, Срок: ${months} мес.`;
       }
 
@@ -211,7 +212,7 @@
       const markupPercent = Math.round((markup / price) * 100);
 
       resultsDiv.innerHTML = `
-        <p><strong>Первый взнос:</strong> ${selectedTariff === 'with' ? prepayment.toLocaleString() + ' ₽' : '—'}</p>
+        <p><strong>Первый взнос:</strong> ${prepayment.toLocaleString()} ₽</p>
         <p><strong>Ежемесячный платёж:</strong> ${monthly.toLocaleString()} ₽</p>
         <p><strong>Стоимость с наценкой:</strong> ${finalCost.toLocaleString()} ₽</p>
         <p><strong>Наценка:</strong> ${markup.toLocaleString()} ₽ (${markupPercent}%)</p>
