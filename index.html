@@ -157,6 +157,7 @@
           <p><strong>Наценка:</strong> 0 ₽ (0%)</p>
         `;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
+        togglePrepaymentSlider();
         return;
       } else {
         errorMessage.style.display = 'none';
@@ -169,7 +170,7 @@
 
       if (selectedTariff === 'with') {
         const minPrepayment = roundUpTo100(baseFinalCost * 0.15);
-        const maxPrepayment = roundUpTo100(baseFinalCost * 0.5);
+        const maxPrepayment = roundUpTo100(baseFinalCost * 0.65);
 
         prepaymentSlider.min = minPrepayment;
         prepaymentSlider.max = maxPrepayment;
@@ -180,8 +181,7 @@
           prepaymentSlider.value = conditionalPrepayment;
         }
 
-        // магнит
-        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 500) {
+        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= 1500) {
           prepaymentSlider.value = conditionalPrepayment;
         }
 
