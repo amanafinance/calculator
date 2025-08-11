@@ -644,10 +644,6 @@
           prepaymentSlider.value = conditionalPrepayment;
         }
 
-        if (Math.abs(prepaymentSlider.value - conditionalPrepayment) <= conditionalPrepayment * 0.05) {
-          prepaymentSlider.value = conditionalPrepayment;
-        }
-
         prepayment = parseInt(prepaymentSlider.value);
         prepaymentInput.value = prepayment;
 
