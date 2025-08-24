@@ -512,9 +512,9 @@
     <div class="input-group">
       <label for="price">Стоимость товара</label>
       <div class="input-wrapper">
-        <input type="number" id="price" placeholder="не менее 50 000 ₽" min="0" />
+        <input type="number" id="price" placeholder="не менее 30 000 ₽" min="0" />
       </div>
-      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 50 000₽</div>
+      <div class="error-message" id="errorMessage">⚠️ Стоимость товара должна быть<br>не менее 30 000₽</div>
     </div>
 
     <div class="input-group">
@@ -610,7 +610,7 @@
       updateMonthLabels(months);
 
       const price = parseInt(priceInput.value);
-      if (isNaN(price) || price < 50000) {
+      if (isNaN(price) || price < 30000) {
         errorMessage.style.display = 'block';
         prepaymentInput.value = 0;
         prepaymentError.style.display = 'none';
