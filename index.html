@@ -71,14 +71,10 @@
       }
     }
 
-
-
     .header {
       text-align: center;
       margin-bottom: 32px;
     }
-
-
 
     .header .title {
       font-size: 28px;
@@ -259,11 +255,19 @@
 
     .month-label {
       position: relative;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-size: 12px;
     }
 
     .month-label.active {
       color: #95C11F;
       font-weight: 600;
+    }
+
+    .month-label.disabled {
+      opacity: 0.3;
+      color: #CBD5E1;
     }
 
     .prepayment-input-group {
@@ -521,11 +525,11 @@
       <label for="months" id="monthsLabel">Срок: 3 месяца</label>
       <div class="slider-container">
         <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-        <div class="months-display">
-          <span class="month-label active">3 мес</span>
-          <span class="month-label">6 мес</span>
-          <span class="month-label">9 мес</span>
-          <span class="month-label">12 мес</span>
+        <div class="months-display" id="monthsDisplay">
+          <span class="month-label active" data-month="3">3 мес</span>
+          <span class="month-label" data-month="6">6 мес</span>
+          <span class="month-label" data-month="9">9 мес</span>
+          <span class="month-label" data-month="12">12 мес</span>
         </div>
       </div>
     </div>
@@ -576,6 +580,8 @@
     const tariffButtons = document.querySelectorAll('.tariff-button');
     const monthLabels = document.querySelectorAll('.month-label');
 
+    const monthsDisplay = document.getElementById('monthsDisplay');
+
     let selectedTariff = 'with';
     let conditionalPrepayment = 0;
 
@@ -585,11 +591,107 @@
 
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
-    function updateMonthLabels(selectedMonth) {
-      monthLabels.forEach((label, index) => {
-        const monthValue = [3, 6, 9, 12][index];
-        label.classList.toggle('active', monthValue === selectedMonth);
+    function getMaxMonthsForPrice(price) {
+      if (price < 30000) return 3;
+      if (price < 50000) return 6;
+      if (price < 100000) return 9;
+      return 12;
+    }
+
+    function getAvailableMonthsForPrice(price) {
+      const maxMonths = getMaxMonthsForPrice(price);
+      const baseMonths = [3, 6, 9, 12];
+      return baseMonths.filter(month => month <= maxMonths);
+    }
+
+    function updateMonthsDisplay(price, selectedMonth) {
+      const maxMonths = getMaxMonthsForPrice(price);
+      
+      // Очищаем текущие отметки
+      monthsDisplay.innerHTML = '';
+      
+      // Создаем отметки в зависимости от максимального срока
+      let displayMonths = [];
+      
+      if (maxMonths <= 6) {
+        // До 49,999₽: показываем все месяцы от 3 до 6
+        displayMonths = [3, 4, 5, 6];
+      } else if (maxMonths <= 9) {
+        // 50,000-99,999₽: показываем 3, 6, 9
+        displayMonths = [3, 6, 9];
+      } else {
+        // 100,000₽ и выше: показываем 3, 6, 9, 12
+        displayMonths = [3, 6, 9, 12];
+      }
+      
+      // Создаем отметки
+      displayMonths.forEach((month, index) => {
+        const label = document.createElement('span');
+        label.className = 'month-label';
+        label.dataset.month = month;
+        label.textContent = `${month} мес`;
+        
+        // Подсвечиваем только точно совпадающую отметку
+        if (selectedMonth === month) {
+          label.classList.add('active');
+        }
+        
+        monthsDisplay.appendChild(label);
       });
+      
+      // Обновляем позиционирование для равномерного распределения
+      const labels = monthsDisplay.querySelectorAll('.month-label');
+      labels.forEach((label, index) => {
+        if (displayMonths.length === 1) {
+          label.style.position = 'absolute';
+          label.style.left = '50%';
+          label.style.transform = 'translateX(-50%)';
+        } else {
+          let position;
+          if (index === 0) {
+            // Первая отметка: выравниваем по левому краю
+            position = 0;
+            label.style.left = `${position}%`;
+            label.style.transform = 'translateX(0)';
+          } else if (index === displayMonths.length - 1) {
+            // Последняя отметка: выравниваем по правому краю
+            position = 100;
+            label.style.left = `${position}%`;
+            label.style.transform = 'translateX(-100%)';
+          } else {
+            // Средние отметки: центрируем
+            position = (index / (displayMonths.length - 1)) * 100;
+            label.style.left = `${position}%`;
+            label.style.transform = 'translateX(-50%)';
+          }
+          label.style.position = 'absolute';
+        }
+      });
+      
+      // Устанавливаем позиционирование для контейнера
+      monthsDisplay.style.position = 'relative';
+      monthsDisplay.style.height = '20px';
+    }
+
+    function updateMonthsSlider(price) {
+      const maxMonths = getMaxMonthsForPrice(price);
+      const currentMonths = parseInt(monthsInput.value);
+      
+      // Обновляем параметры ползунка - теперь можно выбирать любое значение от 3 до максимума
+      monthsInput.min = 3;
+      monthsInput.max = maxMonths;
+      monthsInput.step = 1; // Шаг в 1 месяц для плавного выбора
+      
+      // Если текущее значение больше максимального, устанавливаем максимальное
+      let newValue = currentMonths;
+      if (currentMonths > maxMonths) {
+        newValue = maxMonths;
+      } else if (currentMonths < 3) {
+        newValue = 3;
+      }
+      
+      monthsInput.value = newValue;
+      return newValue;
     }
 
     function togglePrepaymentSlider() {
@@ -601,15 +703,9 @@
     }
 
     function updateCalculator(resetPrepayment = false) {
-      const months = parseInt(monthsInput.value);
-      
-      // Обновляем текст лейбла в зависимости от количества месяцев
-      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
-      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
-      
-      updateMonthLabels(months);
-
       const price = parseInt(priceInput.value);
+      
+      // Проверяем минимальную стоимость
       if (isNaN(price) || price < 30000) {
         errorMessage.style.display = 'block';
         prepaymentInput.value = 0;
@@ -622,10 +718,23 @@
         `;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
+        
+        // Обновляем отображение даже при неверной цене
+        updateMonthsDisplay(30000, 3); // Показываем минимальные настройки
         return;
       } else {
         errorMessage.style.display = 'none';
       }
+
+      // Обновляем ползунок месяцев на основе цены
+      const months = updateMonthsSlider(price);
+      
+      // Обновляем отображение отметок месяцев
+      updateMonthsDisplay(price, months);
+      
+      // Обновляем текст лейбла в зависимости от количества месяцев
+      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
+      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
 
       const percent = selectedTariff === 'with' ? markupWithDown[months] : markupNoDownPayment[months];
       const baseFinalCost = price * (1 + percent / 100);
@@ -774,3 +883,5 @@
 
     updateCalculator(true);
   </script>
+</body>
+</html>
