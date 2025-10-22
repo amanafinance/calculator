@@ -71,10 +71,14 @@
       }
     }
 
+
+
     .header {
       text-align: center;
       margin-bottom: 32px;
     }
+
+
 
     .header .title {
       font-size: 28px;
@@ -216,6 +220,7 @@
       appearance: none;
       cursor: pointer;
       position: relative;
+      transition: background 0.3s ease;
     }
 
     .slider::-webkit-slider-thumb {
@@ -255,19 +260,18 @@
 
     .month-label {
       position: relative;
+      cursor: pointer;
       transition: all 0.3s ease;
-      white-space: nowrap;
-      font-size: 12px;
+    }
+
+    .month-label:hover:not([style*="opacity: 0.3"]) {
+      color: #95C11F;
+      transform: scale(1.1);
     }
 
     .month-label.active {
       color: #95C11F;
       font-weight: 600;
-    }
-
-    .month-label.disabled {
-      opacity: 0.3;
-      color: #CBD5E1;
     }
 
     .prepayment-input-group {
@@ -302,13 +306,39 @@
     .helper-text {
       background: linear-gradient(135deg, #FEF7ED, #FED7AA);
       color: #EA580C;
-      padding: 12px 16px;
+      padding: 16px 20px;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 500;
       margin: 24px 0;
       border-left: 4px solid #EA580C;
       animation: pulseGlow 2s ease-in-out infinite;
+      line-height: 1.6;
+    }
+
+    .helper-text strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .helper-text ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .helper-text li {
+      margin: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .helper-text li::before {
+      content: '•';
+      position: absolute;
+      left: 6px;
+      font-weight: bold;
     }
 
     @keyframes pulseGlow {
@@ -525,11 +555,11 @@
       <label for="months" id="monthsLabel">Срок: 3 месяца</label>
       <div class="slider-container">
         <input type="range" id="months" class="slider" min="3" max="12" value="3" />
-        <div class="months-display" id="monthsDisplay">
-          <span class="month-label active" data-month="3">3 мес</span>
-          <span class="month-label" data-month="6">6 мес</span>
-          <span class="month-label" data-month="9">9 мес</span>
-          <span class="month-label" data-month="12">12 мес</span>
+        <div class="months-display">
+          <span class="month-label active">3 мес</span>
+          <span class="month-label">6 мес</span>
+          <span class="month-label">9 мес</span>
+          <span class="month-label">12 мес</span>
         </div>
       </div>
     </div>
@@ -552,8 +582,14 @@
       <p><strong>Наценка:</strong> <span class="output-value">0 ₽ (0%)</span></p>
     </div>
 
-    <div class="helper-text">
-      💡 Обязательные требования: Поручитель и паспорта обеих лиц
+    <div class="helper-text" id="helperText">
+      <strong>💡 Обязательные требования:</strong>
+      <ul>
+        <li>Покупатель 22-60 лет</li>
+        <li>Поручитель муж. пола 25-60 лет</li>
+        <li>Паспорт обоих лиц (Лицевая и страница с пропиской)</li>
+        <li>Фактический адрес проживания</li>
+      </ul>
     </div>
 
     <div class="buttons">
@@ -579,8 +615,7 @@
     const errorMessage = document.getElementById('errorMessage');
     const tariffButtons = document.querySelectorAll('.tariff-button');
     const monthLabels = document.querySelectorAll('.month-label');
-
-    const monthsDisplay = document.getElementById('monthsDisplay');
+    const helperText = document.getElementById('helperText');
 
     let selectedTariff = 'with';
     let conditionalPrepayment = 0;
@@ -591,107 +626,35 @@
 
     const roundUpTo100 = val => Math.ceil(val / 100) * 100;
 
-    function getMaxMonthsForPrice(price) {
-      if (price < 30000) return 3;
-      if (price < 50000) return 6;
-      if (price < 100000) return 9;
-      return 12;
-    }
-
-    function getAvailableMonthsForPrice(price) {
-      const maxMonths = getMaxMonthsForPrice(price);
-      const baseMonths = [3, 6, 9, 12];
-      return baseMonths.filter(month => month <= maxMonths);
-    }
-
-    function updateMonthsDisplay(price, selectedMonth) {
-      const maxMonths = getMaxMonthsForPrice(price);
-      
-      // Очищаем текущие отметки
-      monthsDisplay.innerHTML = '';
-      
-      // Создаем отметки в зависимости от максимального срока
-      let displayMonths = [];
-      
-      if (maxMonths <= 6) {
-        // До 49,999₽: показываем все месяцы от 3 до 6
-        displayMonths = [3, 4, 5, 6];
-      } else if (maxMonths <= 9) {
-        // 50,000-99,999₽: показываем 3, 6, 9
-        displayMonths = [3, 6, 9];
+    function updateHelperText() {
+      if (selectedTariff === 'with') {
+        helperText.innerHTML = `
+          <strong>💡 Обязательные требования:</strong>
+          <ul>
+            <li>Покупатель 22-60 лет</li>
+            <li>Поручитель муж. пола 25-60 лет</li>
+            <li>Паспорт обоих лиц (Лицевая и страница с пропиской)</li>
+            <li>Фактический адрес проживания</li>
+          </ul>
+        `;
       } else {
-        // 100,000₽ и выше: показываем 3, 6, 9, 12
-        displayMonths = [3, 6, 9, 12];
+        helperText.innerHTML = `
+          <strong>💡 Обязательные требования:</strong>
+          <ul>
+            <li>Покупатель 22-60 лет</li>
+            <li>Поручитель муж. пола 25-60 лет</li>
+            <li>Паспорт обоих лиц (Лицевая и страница с пропиской)</li>
+            <li>Фактический адрес проживания</li>
+          </ul>
+        `;
       }
-      
-      // Создаем отметки
-      displayMonths.forEach((month, index) => {
-        const label = document.createElement('span');
-        label.className = 'month-label';
-        label.dataset.month = month;
-        label.textContent = `${month} мес`;
-        
-        // Подсвечиваем только точно совпадающую отметку
-        if (selectedMonth === month) {
-          label.classList.add('active');
-        }
-        
-        monthsDisplay.appendChild(label);
-      });
-      
-      // Обновляем позиционирование для равномерного распределения
-      const labels = monthsDisplay.querySelectorAll('.month-label');
-      labels.forEach((label, index) => {
-        if (displayMonths.length === 1) {
-          label.style.position = 'absolute';
-          label.style.left = '50%';
-          label.style.transform = 'translateX(-50%)';
-        } else {
-          let position;
-          if (index === 0) {
-            // Первая отметка: выравниваем по левому краю
-            position = 0;
-            label.style.left = `${position}%`;
-            label.style.transform = 'translateX(0)';
-          } else if (index === displayMonths.length - 1) {
-            // Последняя отметка: выравниваем по правому краю
-            position = 100;
-            label.style.left = `${position}%`;
-            label.style.transform = 'translateX(-100%)';
-          } else {
-            // Средние отметки: центрируем
-            position = (index / (displayMonths.length - 1)) * 100;
-            label.style.left = `${position}%`;
-            label.style.transform = 'translateX(-50%)';
-          }
-          label.style.position = 'absolute';
-        }
-      });
-      
-      // Устанавливаем позиционирование для контейнера
-      monthsDisplay.style.position = 'relative';
-      monthsDisplay.style.height = '20px';
     }
 
-    function updateMonthsSlider(price) {
-      const maxMonths = getMaxMonthsForPrice(price);
-      const currentMonths = parseInt(monthsInput.value);
-      
-      // Обновляем параметры ползунка - теперь можно выбирать любое значение от 3 до максимума
-      monthsInput.min = 3;
-      monthsInput.max = maxMonths;
-      monthsInput.step = 1; // Шаг в 1 месяц для плавного выбора
-      
-      // Если текущее значение больше максимального, устанавливаем максимальное
-      let newValue = currentMonths;
-      if (currentMonths > maxMonths) {
-        newValue = maxMonths;
-      } else if (currentMonths < 3) {
-        newValue = 3;
-      }
-      
-      monthsInput.value = newValue;
-      return newValue;
+    function updateMonthLabels(selectedMonth) {
+      monthLabels.forEach((label, index) => {
+        const monthValue = [3, 6, 9, 12][index];
+        label.classList.toggle('active', monthValue === selectedMonth);
+      });
     }
 
     function togglePrepaymentSlider() {
@@ -702,10 +665,81 @@
       }
     }
 
+    function updateMaxMonths(price) {
+      let maxMonths = 12;
+      if (price < 50000) {
+        maxMonths = 6;
+      } else if (price < 100000) {
+        maxMonths = 9;
+      }
+      
+      monthsInput.max = maxMonths;
+      
+      // Если текущее значение больше максимального, сбрасываем на максимальное
+      if (parseInt(monthsInput.value) > maxMonths) {
+        monthsInput.value = maxMonths;
+      }
+      
+      // Обновляем отображение доступных месяцев
+      const monthValues = [3, 6, 9, 12];
+      monthLabels.forEach((label, index) => {
+        const monthValue = monthValues[index];
+        if (monthValue > maxMonths) {
+          label.style.opacity = '0.3';
+          label.style.pointerEvents = 'none';
+        } else {
+          label.style.opacity = '1';
+          label.style.pointerEvents = 'auto';
+        }
+      });
+      
+      // Обновляем визуальное отображение ползунка
+      updateSliderBackground(parseInt(monthsInput.value), maxMonths);
+    }
+
+    function updateSliderBackground(currentValue, maxValue) {
+      const percentage = ((currentValue - 3) / (maxValue - 3)) * 100;
+      const slider = monthsInput;
+      
+      // Создаем градиент для активной и неактивной части
+      const activeColor = '#95C11F';
+      const inactiveColor = '#E2E8F0';
+      const disabledColor = '#F1F5F9';
+      
+      if (maxValue < 12) {
+        const maxPercentage = ((maxValue - 3) / (12 - 3)) * 100;
+        slider.style.background = `linear-gradient(to right, 
+          ${activeColor} 0%, 
+          ${activeColor} ${percentage}%, 
+          ${inactiveColor} ${percentage}%, 
+          ${inactiveColor} ${maxPercentage}%, 
+          ${disabledColor} ${maxPercentage}%, 
+          ${disabledColor} 100%)`;
+      } else {
+        slider.style.background = `linear-gradient(to right, 
+          ${activeColor} 0%, 
+          ${activeColor} ${percentage}%, 
+          ${inactiveColor} ${percentage}%, 
+          ${inactiveColor} 100%)`;
+      }
+    }
+
     function updateCalculator(resetPrepayment = false) {
       const price = parseInt(priceInput.value);
       
-      // Проверяем минимальную стоимость
+      // Сначала обновляем ограничения по месяцам на основе цены
+      if (!isNaN(price) && price >= 30000) {
+        updateMaxMonths(price);
+      }
+      
+      const months = parseInt(monthsInput.value);
+      
+      // Обновляем текст лейбла в зависимости от количества месяцев
+      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
+      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
+      
+      updateMonthLabels(months);
+
       if (isNaN(price) || price < 30000) {
         errorMessage.style.display = 'block';
         prepaymentInput.value = 0;
@@ -718,23 +752,10 @@
         `;
         whatsappBtn.href = "https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.";
         togglePrepaymentSlider();
-        
-        // Обновляем отображение даже при неверной цене
-        updateMonthsDisplay(30000, 3); // Показываем минимальные настройки
         return;
       } else {
         errorMessage.style.display = 'none';
       }
-
-      // Обновляем ползунок месяцев на основе цены
-      const months = updateMonthsSlider(price);
-      
-      // Обновляем отображение отметок месяцев
-      updateMonthsDisplay(price, months);
-      
-      // Обновляем текст лейбла в зависимости от количества месяцев
-      const monthText = months === 1 ? 'месяц' : (months < 5 ? 'месяца' : 'месяцев');
-      monthsLabel.textContent = `Срок: ${months} ${monthText}`;
 
       const percent = selectedTariff === 'with' ? markupWithDown[months] : markupNoDownPayment[months];
       const baseFinalCost = price * (1 + percent / 100);
@@ -807,7 +828,24 @@
         button.classList.add('active');
         button.style.transform = 'scale(1.02)';
         selectedTariff = button.dataset.tariff;
-        updateCalculator(true);
+        // Добавляем обработчик кликов на лейблы месяцев
+    monthLabels.forEach((label, index) => {
+      label.addEventListener('click', () => {
+        const monthValue = [3, 6, 9, 12][index];
+        const maxMonths = parseInt(monthsInput.max) || 12;
+        
+        if (monthValue <= maxMonths) {
+          monthsInput.value = monthValue;
+          updateSliderBackground(monthValue, maxMonths);
+          updateCalculator(true);
+        }
+      });
+    });
+
+    // Инициализация
+    updateCalculator(true);
+    const initialMaxMonths = parseInt(monthsInput.max) || 12;
+    updateSliderBackground(3, initialMaxMonths);
       });
     });
 
@@ -821,7 +859,11 @@
     });
 
     priceInput.addEventListener('input', () => updateCalculator(true));
-    monthsInput.addEventListener('input', () => updateCalculator(true));
+    monthsInput.addEventListener('input', () => {
+      updateCalculator(true);
+      const maxMonths = parseInt(monthsInput.max) || 12;
+      updateSliderBackground(parseInt(monthsInput.value), maxMonths);
+    });
     prepaymentSlider.addEventListener('input', () => updateCalculator(false));
 
     prepaymentInput.addEventListener('input', () => {
@@ -883,5 +925,3 @@
 
     updateCalculator(true);
   </script>
-</body>
-</html>
