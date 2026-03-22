@@ -527,29 +527,46 @@
     });
     prepayInput.addEventListener('input', () => {
       const raw = prepayInput.value.replace(/\D/g, '');
-      const cursor = prepayInput.selectionStart;
-      const oldLen = prepayInput.value.length;
-      let val = roundUpTo100(parseInt(raw) || 0);
+
+      // Поле пустое — разрешаем очистить
+      if (!raw) {
+        prepayInput.value = '';
+        prepayError.classList.remove('visible');
+        return;
+      }
+
+      const num = parseInt(raw);
       const min = parseInt(prepaySlider.min);
       const max = parseInt(prepaySlider.max);
-      // Получаем дефолтный взнос 25%
+
+      // Пока число меньше минимума — показываем как есть, не форматируем
+      if (num < min) {
+        prepayError.textContent = `Допустимо от ${min.toLocaleString('ru-RU')} до ${max.toLocaleString('ru-RU')} ₽`;
+        prepayError.classList.add('visible');
+        return;
+      }
+
+      // Форматируем только когда значение в диапазоне
+      const cursor = prepayInput.selectionStart;
+      const oldLen = prepayInput.value.length;
+      let val = roundUpTo100(num);
+
       const priceRaw = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
       const months = parseInt(monthsEl.value);
       const defaultPrepay = roundUpTo100(priceRaw * (1 + markupWithDown[months] / 100) * 0.25);
-      // Магнит: если близко к 25% — притягиваем
       const magnetZone = Math.round((max - min) * 0.04);
-      if (Math.abs(val - defaultPrepay) <= magnetZone && val !== 0) {
-        val = defaultPrepay;
-      }
-      const formatted = val ? val.toLocaleString('ru-RU') : '';
+      if (Math.abs(val - defaultPrepay) <= magnetZone) val = defaultPrepay;
+
+      const formatted = val.toLocaleString('ru-RU');
       prepayInput.value = formatted;
       const diff = formatted.length - oldLen;
       try { prepayInput.setSelectionRange(cursor + diff, cursor + diff); } catch(e) {}
-      if (val >= min && val <= max) {
+
+      if (val <= max) {
         prepayError.classList.remove('visible');
         prepaySlider.value = val;
         calculate(false);
-      } else if (val !== 0) {
+      } else {
         prepayError.textContent = `Допустимо от ${min.toLocaleString('ru-RU')} до ${max.toLocaleString('ru-RU')} ₽`;
         prepayError.classList.add('visible');
       }
