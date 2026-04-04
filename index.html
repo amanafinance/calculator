@@ -161,32 +161,60 @@
     .btn-whatsapp { animation: pulse 2.5s ease-in-out 1.5s infinite; }
     .result-card-value { display: block; }
     .dv { display: inline-block; }
+    /* ─── Safe area для iPhone с чёлкой/домашней полосой ─── */
+    .sticky-bar {
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+
+    /* ─── Планшеты и десктоп ─── */
+    @media (min-width: 600px) {
+      .app-wrapper { max-width: 480px; margin: 0 auto; }
+      .card { border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-md); margin: 24px auto 100px; }
+      .card-hero { border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+      .card-body { padding: 28px 28px 32px; max-width: 100%; width: 100%; margin: 0; border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+      body { background: #e8f0eb; padding: 0; }
+      .sticky-bar { max-width: 480px; left: 50%; transform: translateX(-50%); border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+    }
+
+    /* ─── Средние телефоны 390–420px ─── */
     @media (max-width: 420px) {
-      body { padding: 12px; }
       .card-hero { padding: 22px 20px 20px; }
-      .card-body { padding: 20px 18px 24px; }
-      .results-grid { grid-template-columns: 1fr 1fr; }
-      .hero-logo-wrap { width: 180px; right: -20px; }
-      .hero-logo { width: 180px; height: 180px; }
+      .card-body { padding: 20px 16px 24px; }
+      .hero-logo { width: 160px; height: 160px; }
       .hero-content { max-width: 60%; }
     }
+
+    /* ─── Маленькие телефоны 360–390px ─── */
     @media (max-width: 390px) {
       .hero-title { font-size: 21px; }
-      .hero-chip { font-size: 10px; padding: 5px 9px; }
-      .hero-chips { gap: 6px; }
-      .hero-label { font-size: 9px; letter-spacing: 1.5px; }
-      .hero-logo-wrap { width: 155px; right: -15px; }
-      .hero-logo { width: 155px; height: 155px; }
+      .hero-label { font-size: 8px; letter-spacing: 1.5px; }
+      .hero-logo { width: 140px; height: 140px; }
+      .hero-logo-wrap { right: 0px; }
       .hero-content { max-width: 58%; }
       .result-card-value { font-size: 17px; }
       .result-card { padding: 12px 10px; }
+      .result-card-label { font-size: 10px; }
+      .sticky-amount { font-size: 19px; }
+      .sticky-wa-btn { font-size: 13px; padding: 12px 14px; }
     }
+
+    /* ─── Очень маленькие 320–360px ─── */
     @media (max-width: 360px) {
-      .hero-title { font-size: 19px; }
-      .hero-chip { font-size: 9px; padding: 4px 8px; }
-      .hero-logo { width: 140px; height: 140px; }
-      .hero-logo-name { font-size: 11px; }
+      .card-hero { padding: 18px 16px 16px; }
+      .card-body { padding: 16px 14px 20px; }
+      .hero-title { font-size: 18px; }
+      .hero-company { font-size: 14px; }
+      .hero-logo { width: 120px; height: 120px; }
+      .hero-content { max-width: 55%; }
       .result-card-value { font-size: 15px; }
+      .result-card { padding: 10px 8px; }
+      .result-card-label { font-size: 9px; letter-spacing: 0.5px; }
+      .segment-btn { font-size: 12px; padding: 10px 6px; }
+      .sticky-amount { font-size: 17px; }
+      .sticky-wa-btn { font-size: 12px; padding: 11px 12px; gap: 6px; }
+      .field-label { font-size: 12px; }
+      .input-box input { font-size: 15px; }
+      .section-label { font-size: 11px; }
     }
   </style>
 </head>
