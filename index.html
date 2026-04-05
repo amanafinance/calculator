@@ -540,9 +540,9 @@
         <div class="dash-stats" id="dashStats"></div>
         <!-- Информация о договоре -->
         <div class="dash-card" id="dashInfo"></div>
-        <!-- График платежей -->
+        <!-- График ежемесячных платежей -->
         <div class="dash-card">
-          <div class="dash-card-title">График платежей</div>
+          <div class="dash-card-title">График ежемесячных платежей</div>
           <div class="payments-list" id="paymentsList"></div>
         </div>
         <button class="logout-btn" onclick="doLogout()">Выйти из кабинета</button>
@@ -660,11 +660,7 @@
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
         '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
-        '</div>';
+'';
 
       document.getElementById('dashInfo').innerHTML =
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
@@ -830,11 +826,7 @@
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
         '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
-        '</div>';
+'';
 
       document.getElementById('dashInfo').innerHTML =
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
@@ -1169,11 +1161,7 @@
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
         '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
-        '</div>';
+'';
 
       document.getElementById('dashInfo').innerHTML =
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
