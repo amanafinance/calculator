@@ -617,6 +617,8 @@
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
           if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
+          GLOBAL_CONTRACT = contract;
+          GLOBAL_PHONE = phone;
           showDashboard(data);
         })
         .catch(() => {
@@ -717,26 +719,6 @@
       document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
     }
 
-    function doRefresh() {
-      var contract = document.getElementById('inputContract').value.trim();
-      var phone    = document.getElementById('inputPhone').value.replace(/\D/g, '');
-      var btn      = document.querySelector('.refresh-btn');
-      btn.textContent = 'Загрузка...';
-      btn.disabled = true;
-      fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
-        .then(function(r){ return r.json(); })
-        .then(function(data) {
-          btn.textContent = '↻ Обновить данные';
-          btn.disabled = false;
-          if (data.error) return;
-          showDashboard(data);
-        })
-        .catch(function() {
-          btn.textContent = '↻ Обновить данные';
-          btn.disabled = false;
-        });
-    }
-
     function doLogout() {
       document.getElementById('loginSection').style.display = 'block';
       document.getElementById('loginSection').style.opacity = '1';
@@ -803,6 +785,8 @@
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
           if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
+          GLOBAL_CONTRACT = contract;
+          GLOBAL_PHONE = phone;
           showDashboard(data);
         })
         .catch(() => {
@@ -1138,6 +1122,8 @@
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
           if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
+          GLOBAL_CONTRACT = contract;
+          GLOBAL_PHONE = phone;
           showDashboard(data);
         })
         .catch(() => {
@@ -1285,5 +1271,33 @@
     </button>
   </nav>
 
+  <script>
+    var GLOBAL_API_URL = 'https://script.google.com/macros/s/AKfycbxrN514qhyYVlWNcv8a7wLSwJigkqELy4qLvYhdOcQM_G7liBilQaB2Fj7coT3TEbOv/exec';
+    var GLOBAL_CONTRACT = '';
+    var GLOBAL_PHONE = '';
+
+    function doRefresh() {
+      var contract = GLOBAL_CONTRACT || document.getElementById('inputContract').value.trim();
+      var phone    = GLOBAL_PHONE    || document.getElementById('inputPhone').value.replace(/\D/g, '');
+      var btn = document.querySelector('.refresh-btn');
+      if (!contract || !phone) return;
+      btn.textContent = 'Загрузка...';
+      btn.disabled = true;
+      fetch(GLOBAL_API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+          btn.textContent = '↻ Обновить данные';
+          btn.disabled = false;
+          if (data.error) return;
+          GLOBAL_CONTRACT = contract;
+          GLOBAL_PHONE = phone;
+          showDashboard(data);
+        })
+        .catch(function() {
+          btn.textContent = '↻ Обновить данные';
+          btn.disabled = false;
+        });
+    }
+  </script>
 </body>
 </html>
