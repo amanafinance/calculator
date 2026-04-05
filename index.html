@@ -640,7 +640,7 @@
         var today2 = new Date(); today2.setHours(0,0,0,0);
         var parts2 = p.date.split('.');
         var pDate2 = new Date(parts2[2], parts2[1]-1, parts2[0]);
-        if (pDate2 < today2 && p.paid < p.amount) {
+        if (pDate2 <= today2 && p.paid < p.amount) {
           overdueSum += (p.amount - p.paid);
         }
       });
@@ -676,7 +676,7 @@
         var today = new Date(); today.setHours(0,0,0,0);
         var parts = p.date.split('.'); 
         var pDate = new Date(parts[2], parts[1]-1, parts[0]);
-        var dateIsPast = pDate < today;
+        var dateIsPast = pDate <= today;
         var dotClass, statusLabel;
 
         if (p.status === 'оплачен') {
@@ -806,7 +806,7 @@
         var today2 = new Date(); today2.setHours(0,0,0,0);
         var parts2 = p.date.split('.');
         var pDate2 = new Date(parts2[2], parts2[1]-1, parts2[0]);
-        if (pDate2 < today2 && p.paid < p.amount) {
+        if (pDate2 <= today2 && p.paid < p.amount) {
           overdueSum += (p.amount - p.paid);
         }
       });
@@ -842,7 +842,7 @@
         var today = new Date(); today.setHours(0,0,0,0);
         var parts = p.date.split('.'); 
         var pDate = new Date(parts[2], parts[1]-1, parts[0]);
-        var dateIsPast = pDate < today;
+        var dateIsPast = pDate <= today;
         var dotClass, statusLabel;
 
         if (p.status === 'оплачен') {
@@ -1141,7 +1141,7 @@
         var today2 = new Date(); today2.setHours(0,0,0,0);
         var parts2 = p.date.split('.');
         var pDate2 = new Date(parts2[2], parts2[1]-1, parts2[0]);
-        if (pDate2 < today2 && p.paid < p.amount) {
+        if (pDate2 <= today2 && p.paid < p.amount) {
           overdueSum += (p.amount - p.paid);
         }
       });
@@ -1177,7 +1177,7 @@
         var today = new Date(); today.setHours(0,0,0,0);
         var parts = p.date.split('.'); 
         var pDate = new Date(parts[2], parts[1]-1, parts[0]);
-        var dateIsPast = pDate < today;
+        var dateIsPast = pDate <= today;
         var dotClass, statusLabel;
 
         if (p.status === 'оплачен') {
