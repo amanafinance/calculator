@@ -642,10 +642,7 @@
       var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
       var overdueSum  = 0;
       payments.forEach(function(p) {
-        var today2 = new Date(); today2.setHours(0,0,0,0);
-        var parts2 = p.date.split('.');
-        var pDate2 = new Date(parts2[2], parts2[1]-1, parts2[0]);
-        if (pDate2 <= today2 && p.paid < p.amount) {
+        if (p.status === 'просрочен' || p.status === 'частично') {
           overdueSum += (p.amount - p.paid);
         }
       });
@@ -687,16 +684,15 @@
         if (p.status === 'оплачен') {
           dotClass = 'paid';
           statusLabel = 'Оплачен';
-        } else if (p.paid > 0 && !dateIsPast) {
+        } else if (p.status === 'частично_будущее') {
           // Частично оплачен, срок не прошёл — жёлтый, не просрочка
           dotClass = 'partial';
-          statusLabel = 'Частично (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (dateIsPast && p.paid > 0 && p.paid < p.amount) {
+          statusLabel = 'Частично оплачен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
+        } else if (p.status === 'частично') {
           // Дата прошла, оплачена часть — красный
           dotClass = 'overdue';
           statusLabel = 'Частично просрочен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (dateIsPast) {
-          // Дата прошла, не оплачен — красный
+        } else if (p.status === 'просрочен') {
           dotClass = 'overdue';
           statusLabel = 'Просрочен';
         } else {
@@ -810,10 +806,7 @@
       var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
       var overdueSum  = 0;
       payments.forEach(function(p) {
-        var today2 = new Date(); today2.setHours(0,0,0,0);
-        var parts2 = p.date.split('.');
-        var pDate2 = new Date(parts2[2], parts2[1]-1, parts2[0]);
-        if (pDate2 <= today2 && p.paid < p.amount) {
+        if (p.status === 'просрочен' || p.status === 'частично') {
           overdueSum += (p.amount - p.paid);
         }
       });
@@ -855,16 +848,15 @@
         if (p.status === 'оплачен') {
           dotClass = 'paid';
           statusLabel = 'Оплачен';
-        } else if (p.paid > 0 && !dateIsPast) {
+        } else if (p.status === 'частично_будущее') {
           // Частично оплачен, срок не прошёл — жёлтый, не просрочка
           dotClass = 'partial';
-          statusLabel = 'Частично (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (dateIsPast && p.paid > 0 && p.paid < p.amount) {
+          statusLabel = 'Частично оплачен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
+        } else if (p.status === 'частично') {
           // Дата прошла, оплачена часть — красный
           dotClass = 'overdue';
           statusLabel = 'Частично просрочен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (dateIsPast) {
-          // Дата прошла, не оплачен — красный
+        } else if (p.status === 'просрочен') {
           dotClass = 'overdue';
           statusLabel = 'Просрочен';
         } else {
@@ -1147,10 +1139,7 @@
       var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
       var overdueSum  = 0;
       payments.forEach(function(p) {
-        var today2 = new Date(); today2.setHours(0,0,0,0);
-        var parts2 = p.date.split('.');
-        var pDate2 = new Date(parts2[2], parts2[1]-1, parts2[0]);
-        if (pDate2 <= today2 && p.paid < p.amount) {
+        if (p.status === 'просрочен' || p.status === 'частично') {
           overdueSum += (p.amount - p.paid);
         }
       });
@@ -1192,16 +1181,15 @@
         if (p.status === 'оплачен') {
           dotClass = 'paid';
           statusLabel = 'Оплачен';
-        } else if (p.paid > 0 && !dateIsPast) {
+        } else if (p.status === 'частично_будущее') {
           // Частично оплачен, срок не прошёл — жёлтый, не просрочка
           dotClass = 'partial';
-          statusLabel = 'Частично (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (dateIsPast && p.paid > 0 && p.paid < p.amount) {
+          statusLabel = 'Частично оплачен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
+        } else if (p.status === 'частично') {
           // Дата прошла, оплачена часть — красный
           dotClass = 'overdue';
           statusLabel = 'Частично просрочен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (dateIsPast) {
-          // Дата прошла, не оплачен — красный
+        } else if (p.status === 'просрочен') {
           dotClass = 'overdue';
           statusLabel = 'Просрочен';
         } else {
