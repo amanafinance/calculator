@@ -633,27 +633,32 @@
       var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
       var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
       var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
+      var overdueSum  = 0;
+      payments.forEach(function(p) {
+        if (p.status === 'просрочен' || p.status === 'частично') {
+          overdueSum += (p.amount - p.paid);
+        }
+      });
 
       document.getElementById('dashStats').innerHTML =
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
           '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
         '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
+        '<div class="dash-stat" style="' + (overdueSum > 0 ? 'border:2px solid #e84245' : '') + '">' +
+          '<div class="dash-stat-label" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">Просрочка</div>' +
+          '<div class="dash-stat-value" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">' + fmtNum(overdueSum) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (overdueSum > 0 ? 'Требует оплаты' : 'Просрочек нет') + '</div>' +
         '</div>' +
-        (overdueCount > 0 ?
-        '<div class="dash-stat" style="border:2px solid #e84245">' +
-          '<div class="dash-stat-label" style="color:#e84245">Просрочено</div>' +
-          '<div class="dash-stat-value" style="color:#e84245">' + overdueCount + ' платёж' + (overdueCount > 1 ? 'а' : '') + '</div>' +
-          '<div class="dash-stat-sub">Требует оплаты</div>' +
-        '</div>' : '') +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Оплачено</div>' +
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
+        '</div>' +
+        '<div class="dash-stat">' +
+          '<div class="dash-stat-label">Следующий платёж</div>' +
+          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
         '</div>';
 
       document.getElementById('dashInfo').innerHTML =
@@ -774,27 +779,32 @@
       var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
       var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
       var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
+      var overdueSum  = 0;
+      payments.forEach(function(p) {
+        if (p.status === 'просрочен' || p.status === 'частично') {
+          overdueSum += (p.amount - p.paid);
+        }
+      });
 
       document.getElementById('dashStats').innerHTML =
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
           '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
         '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
+        '<div class="dash-stat" style="' + (overdueSum > 0 ? 'border:2px solid #e84245' : '') + '">' +
+          '<div class="dash-stat-label" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">Просрочка</div>' +
+          '<div class="dash-stat-value" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">' + fmtNum(overdueSum) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (overdueSum > 0 ? 'Требует оплаты' : 'Просрочек нет') + '</div>' +
         '</div>' +
-        (overdueCount > 0 ?
-        '<div class="dash-stat" style="border:2px solid #e84245">' +
-          '<div class="dash-stat-label" style="color:#e84245">Просрочено</div>' +
-          '<div class="dash-stat-value" style="color:#e84245">' + overdueCount + ' платёж' + (overdueCount > 1 ? 'а' : '') + '</div>' +
-          '<div class="dash-stat-sub">Требует оплаты</div>' +
-        '</div>' : '') +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Оплачено</div>' +
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
+        '</div>' +
+        '<div class="dash-stat">' +
+          '<div class="dash-stat-label">Следующий платёж</div>' +
+          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
         '</div>';
 
       document.getElementById('dashInfo').innerHTML =
@@ -1084,27 +1094,32 @@
       var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
       var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
       var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
+      var overdueSum  = 0;
+      payments.forEach(function(p) {
+        if (p.status === 'просрочен' || p.status === 'частично') {
+          overdueSum += (p.amount - p.paid);
+        }
+      });
 
       document.getElementById('dashStats').innerHTML =
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
           '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
         '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
+        '<div class="dash-stat" style="' + (overdueSum > 0 ? 'border:2px solid #e84245' : '') + '">' +
+          '<div class="dash-stat-label" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">Просрочка</div>' +
+          '<div class="dash-stat-value" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">' + fmtNum(overdueSum) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (overdueSum > 0 ? 'Требует оплаты' : 'Просрочек нет') + '</div>' +
         '</div>' +
-        (overdueCount > 0 ?
-        '<div class="dash-stat" style="border:2px solid #e84245">' +
-          '<div class="dash-stat-label" style="color:#e84245">Просрочено</div>' +
-          '<div class="dash-stat-value" style="color:#e84245">' + overdueCount + ' платёж' + (overdueCount > 1 ? 'а' : '') + '</div>' +
-          '<div class="dash-stat-sub">Требует оплаты</div>' +
-        '</div>' : '') +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Оплачено</div>' +
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
+        '</div>' +
+        '<div class="dash-stat">' +
+          '<div class="dash-stat-label">Следующий платёж</div>' +
+          '<div class="dash-stat-value">' + fmtNum(nextP ? nextP.amount : 0) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
         '</div>';
 
       document.getElementById('dashInfo').innerHTML =
