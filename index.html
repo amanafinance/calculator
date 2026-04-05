@@ -622,70 +622,65 @@
     }
 
     function showDashboard(data) {
-      var c = data.client;
       var payments = data.payments || [];
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
-      // Считаем статистику
-      var paid = payments.filter(p => p.status === 'paid').length;
-      var overdue = payments.filter(p => p.status === 'overdue').length;
-      var upcoming = payments.filter(p => p.status === 'upcoming').length;
-      var paidSum = payments.filter(p => p.status === 'paid').reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
-      var remaining = (parseFloat(c.totalAmount) || 0) - paidSum;
+      var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
+      var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
+      var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
 
-      // Статистика карточки
       document.getElementById('dashStats').innerHTML =
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
-          '<div class="dash-stat-value">' + fmtNum(remaining) + ' ₽</div>' +
-          '<div class="dash-stat-sub">из ' + fmtNum(c.totalAmount) + ' ₽</div>' +
+          '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
+          '<div class="dash-stat-sub">из ' + fmtNum(data.price) + ' ₽</div>' +
         '</div>' +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(c.monthlyPayment) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (payments.find(p => p.status === 'upcoming') ? payments.find(p => p.status === 'upcoming').scheduledDate : '—') + '</div>' +
+          '<div class="dash-stat-value">' + fmtNum(data.monthly) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
         '</div>' +
-        (overdue > 0 ? '<div class="dash-stat" style="border: 2px solid #e84245;">' +
+        (overdueCount > 0 ?
+        '<div class="dash-stat" style="border:2px solid #e84245">' +
           '<div class="dash-stat-label" style="color:#e84245">Просрочено</div>' +
-          '<div class="dash-stat-value" style="color:#e84245">' + overdue + ' платёж' + (overdue > 1 ? 'а' : '') + '</div>' +
+          '<div class="dash-stat-value" style="color:#e84245">' + overdueCount + ' платёж' + (overdueCount > 1 ? 'а' : '') + '</div>' +
           '<div class="dash-stat-sub">Требует оплаты</div>' +
         '</div>' : '') +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Оплачено</div>' +
-          '<div class="dash-stat-value">' + paid + ' из ' + payments.length + '</div>' +
+          '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
         '</div>';
 
-      // Инфо о договоре
       document.getElementById('dashInfo').innerHTML =
-        '<div class="dash-card-title">Договор ' + c.contract + '</div>' +
-        row('Клиент', c.name) +
-        row('Товар', c.product) +
-        row('Дата договора', c.startDate) +
-        row('Первый взнос', fmtNum(c.prepayment) + ' ₽') +
-        row('Ежемесячный платёж', fmtNum(c.monthlyPayment) + ' ₽') +
-        row('Срок', c.termMonths + ' мес.');
+        '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
+        row('Клиент', data.name) +
+        row('Товар', data.product) +
+        row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
+        row('Ежемесячный платёж', fmtNum(data.monthly) + ' ₽') +
+        row('Срок', data.months + ' мес.');
 
-      // Платежи
       var html = '';
       payments.forEach(function(p) {
-        var statusLabel = p.status === 'paid' ? 'Оплачен' + (p.paidDate ? ' ' + p.paidDate : '') :
-                          p.status === 'overdue' ? 'Просрочен' : 'Ожидается';
+        var dotClass = p.status === 'оплачен' ? 'paid' : p.status === 'просрочен' ? 'overdue' : p.status === 'частично' ? 'overdue' : 'upcoming';
+        var statusLabel = p.status === 'оплачен' ? 'Оплачен' :
+                          p.status === 'просрочен' ? 'Просрочен' :
+                          p.status === 'частично' ? 'Частично (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)' :
+                          'Ожидается';
         html +=
           '<div class="payment-row">' +
-            '<div class="payment-dot ' + p.status + '"></div>' +
+            '<div class="payment-dot ' + dotClass + '"></div>' +
             '<div class="payment-info">' +
-              '<div class="payment-month">' + p.month + ' месяц</div>' +
-              '<div class="payment-date">По графику: ' + p.scheduledDate + '</div>' +
+              '<div class="payment-month">' + p.month + '</div>' +
             '</div>' +
             '<div class="payment-right">' +
               '<div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div>' +
-              '<div class="payment-status ' + p.status + '">' + statusLabel + '</div>' +
+              '<div class="payment-status ' + dotClass + '">' + statusLabel + '</div>' +
             '</div>' +
           '</div>';
       });
-      document.getElementById('paymentsList').innerHTML = html;
+      document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
     }
 
     function doLogout() {
@@ -764,70 +759,65 @@
     }
 
     function showDashboard(data) {
-      var c = data.client;
       var payments = data.payments || [];
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
-      // Считаем статистику
-      var paid = payments.filter(p => p.status === 'paid').length;
-      var overdue = payments.filter(p => p.status === 'overdue').length;
-      var upcoming = payments.filter(p => p.status === 'upcoming').length;
-      var paidSum = payments.filter(p => p.status === 'paid').reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
-      var remaining = (parseFloat(c.totalAmount) || 0) - paidSum;
+      var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
+      var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
+      var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
 
-      // Статистика карточки
       document.getElementById('dashStats').innerHTML =
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
-          '<div class="dash-stat-value">' + fmtNum(remaining) + ' ₽</div>' +
-          '<div class="dash-stat-sub">из ' + fmtNum(c.totalAmount) + ' ₽</div>' +
+          '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
+          '<div class="dash-stat-sub">из ' + fmtNum(data.price) + ' ₽</div>' +
         '</div>' +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(c.monthlyPayment) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (payments.find(p => p.status === 'upcoming') ? payments.find(p => p.status === 'upcoming').scheduledDate : '—') + '</div>' +
+          '<div class="dash-stat-value">' + fmtNum(data.monthly) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
         '</div>' +
-        (overdue > 0 ? '<div class="dash-stat" style="border: 2px solid #e84245;">' +
+        (overdueCount > 0 ?
+        '<div class="dash-stat" style="border:2px solid #e84245">' +
           '<div class="dash-stat-label" style="color:#e84245">Просрочено</div>' +
-          '<div class="dash-stat-value" style="color:#e84245">' + overdue + ' платёж' + (overdue > 1 ? 'а' : '') + '</div>' +
+          '<div class="dash-stat-value" style="color:#e84245">' + overdueCount + ' платёж' + (overdueCount > 1 ? 'а' : '') + '</div>' +
           '<div class="dash-stat-sub">Требует оплаты</div>' +
         '</div>' : '') +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Оплачено</div>' +
-          '<div class="dash-stat-value">' + paid + ' из ' + payments.length + '</div>' +
+          '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
         '</div>';
 
-      // Инфо о договоре
       document.getElementById('dashInfo').innerHTML =
-        '<div class="dash-card-title">Договор ' + c.contract + '</div>' +
-        row('Клиент', c.name) +
-        row('Товар', c.product) +
-        row('Дата договора', c.startDate) +
-        row('Первый взнос', fmtNum(c.prepayment) + ' ₽') +
-        row('Ежемесячный платёж', fmtNum(c.monthlyPayment) + ' ₽') +
-        row('Срок', c.termMonths + ' мес.');
+        '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
+        row('Клиент', data.name) +
+        row('Товар', data.product) +
+        row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
+        row('Ежемесячный платёж', fmtNum(data.monthly) + ' ₽') +
+        row('Срок', data.months + ' мес.');
 
-      // Платежи
       var html = '';
       payments.forEach(function(p) {
-        var statusLabel = p.status === 'paid' ? 'Оплачен' + (p.paidDate ? ' ' + p.paidDate : '') :
-                          p.status === 'overdue' ? 'Просрочен' : 'Ожидается';
+        var dotClass = p.status === 'оплачен' ? 'paid' : p.status === 'просрочен' ? 'overdue' : p.status === 'частично' ? 'overdue' : 'upcoming';
+        var statusLabel = p.status === 'оплачен' ? 'Оплачен' :
+                          p.status === 'просрочен' ? 'Просрочен' :
+                          p.status === 'частично' ? 'Частично (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)' :
+                          'Ожидается';
         html +=
           '<div class="payment-row">' +
-            '<div class="payment-dot ' + p.status + '"></div>' +
+            '<div class="payment-dot ' + dotClass + '"></div>' +
             '<div class="payment-info">' +
-              '<div class="payment-month">' + p.month + ' месяц</div>' +
-              '<div class="payment-date">По графику: ' + p.scheduledDate + '</div>' +
+              '<div class="payment-month">' + p.month + '</div>' +
             '</div>' +
             '<div class="payment-right">' +
               '<div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div>' +
-              '<div class="payment-status ' + p.status + '">' + statusLabel + '</div>' +
+              '<div class="payment-status ' + dotClass + '">' + statusLabel + '</div>' +
             '</div>' +
           '</div>';
       });
-      document.getElementById('paymentsList').innerHTML = html;
+      document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
     }
 
     function doLogout() {
@@ -1075,70 +1065,65 @@
     }
 
     function showDashboard(data) {
-      var c = data.client;
       var payments = data.payments || [];
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
-      // Считаем статистику
-      var paid = payments.filter(p => p.status === 'paid').length;
-      var overdue = payments.filter(p => p.status === 'overdue').length;
-      var upcoming = payments.filter(p => p.status === 'upcoming').length;
-      var paidSum = payments.filter(p => p.status === 'paid').reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
-      var remaining = (parseFloat(c.totalAmount) || 0) - paidSum;
+      var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
+      var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
+      var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
 
-      // Статистика карточки
       document.getElementById('dashStats').innerHTML =
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
-          '<div class="dash-stat-value">' + fmtNum(remaining) + ' ₽</div>' +
-          '<div class="dash-stat-sub">из ' + fmtNum(c.totalAmount) + ' ₽</div>' +
+          '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
+          '<div class="dash-stat-sub">из ' + fmtNum(data.price) + ' ₽</div>' +
         '</div>' +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Следующий платёж</div>' +
-          '<div class="dash-stat-value">' + fmtNum(c.monthlyPayment) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (payments.find(p => p.status === 'upcoming') ? payments.find(p => p.status === 'upcoming').scheduledDate : '—') + '</div>' +
+          '<div class="dash-stat-value">' + fmtNum(data.monthly) + ' ₽</div>' +
+          '<div class="dash-stat-sub">' + (nextP ? nextP.date : '—') + '</div>' +
         '</div>' +
-        (overdue > 0 ? '<div class="dash-stat" style="border: 2px solid #e84245;">' +
+        (overdueCount > 0 ?
+        '<div class="dash-stat" style="border:2px solid #e84245">' +
           '<div class="dash-stat-label" style="color:#e84245">Просрочено</div>' +
-          '<div class="dash-stat-value" style="color:#e84245">' + overdue + ' платёж' + (overdue > 1 ? 'а' : '') + '</div>' +
+          '<div class="dash-stat-value" style="color:#e84245">' + overdueCount + ' платёж' + (overdueCount > 1 ? 'а' : '') + '</div>' +
           '<div class="dash-stat-sub">Требует оплаты</div>' +
         '</div>' : '') +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Оплачено</div>' +
-          '<div class="dash-stat-value">' + paid + ' из ' + payments.length + '</div>' +
+          '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
         '</div>';
 
-      // Инфо о договоре
       document.getElementById('dashInfo').innerHTML =
-        '<div class="dash-card-title">Договор ' + c.contract + '</div>' +
-        row('Клиент', c.name) +
-        row('Товар', c.product) +
-        row('Дата договора', c.startDate) +
-        row('Первый взнос', fmtNum(c.prepayment) + ' ₽') +
-        row('Ежемесячный платёж', fmtNum(c.monthlyPayment) + ' ₽') +
-        row('Срок', c.termMonths + ' мес.');
+        '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
+        row('Клиент', data.name) +
+        row('Товар', data.product) +
+        row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
+        row('Ежемесячный платёж', fmtNum(data.monthly) + ' ₽') +
+        row('Срок', data.months + ' мес.');
 
-      // Платежи
       var html = '';
       payments.forEach(function(p) {
-        var statusLabel = p.status === 'paid' ? 'Оплачен' + (p.paidDate ? ' ' + p.paidDate : '') :
-                          p.status === 'overdue' ? 'Просрочен' : 'Ожидается';
+        var dotClass = p.status === 'оплачен' ? 'paid' : p.status === 'просрочен' ? 'overdue' : p.status === 'частично' ? 'overdue' : 'upcoming';
+        var statusLabel = p.status === 'оплачен' ? 'Оплачен' :
+                          p.status === 'просрочен' ? 'Просрочен' :
+                          p.status === 'частично' ? 'Частично (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)' :
+                          'Ожидается';
         html +=
           '<div class="payment-row">' +
-            '<div class="payment-dot ' + p.status + '"></div>' +
+            '<div class="payment-dot ' + dotClass + '"></div>' +
             '<div class="payment-info">' +
-              '<div class="payment-month">' + p.month + ' месяц</div>' +
-              '<div class="payment-date">По графику: ' + p.scheduledDate + '</div>' +
+              '<div class="payment-month">' + p.month + '</div>' +
             '</div>' +
             '<div class="payment-right">' +
               '<div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div>' +
-              '<div class="payment-status ' + p.status + '">' + statusLabel + '</div>' +
+              '<div class="payment-status ' + dotClass + '">' + statusLabel + '</div>' +
             '</div>' +
           '</div>';
       });
-      document.getElementById('paymentsList').innerHTML = html;
+      document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
     }
 
     function doLogout() {
