@@ -622,7 +622,11 @@
     }
 
     function showDashboard(data) {
-      var payments = data.payments || [];
+      // Обрезаем платежи по реальному сроку клиента
+      var allPayments = data.payments || [];
+      var term = parseInt(data.months) || allPayments.length;
+      var payments = allPayments.slice(0, term);
+
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
@@ -634,7 +638,6 @@
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
           '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
-          '<div class="dash-stat-sub">из ' + fmtNum(data.price) + ' ₽</div>' +
         '</div>' +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Следующий платёж</div>' +
@@ -657,6 +660,7 @@
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
         row('Клиент', data.name) +
         row('Товар', data.product) +
+        row('Общая стоимость', fmtNum(data.price) + ' ₽') +
         row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
         row('Ежемесячный платёж', fmtNum(data.monthly) + ' ₽') +
         row('Срок', data.months + ' мес.');
@@ -759,7 +763,11 @@
     }
 
     function showDashboard(data) {
-      var payments = data.payments || [];
+      // Обрезаем платежи по реальному сроку клиента
+      var allPayments = data.payments || [];
+      var term = parseInt(data.months) || allPayments.length;
+      var payments = allPayments.slice(0, term);
+
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
@@ -771,7 +779,6 @@
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
           '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
-          '<div class="dash-stat-sub">из ' + fmtNum(data.price) + ' ₽</div>' +
         '</div>' +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Следующий платёж</div>' +
@@ -794,6 +801,7 @@
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
         row('Клиент', data.name) +
         row('Товар', data.product) +
+        row('Общая стоимость', fmtNum(data.price) + ' ₽') +
         row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
         row('Ежемесячный платёж', fmtNum(data.monthly) + ' ₽') +
         row('Срок', data.months + ' мес.');
@@ -1065,7 +1073,11 @@
     }
 
     function showDashboard(data) {
-      var payments = data.payments || [];
+      // Обрезаем платежи по реальному сроку клиента
+      var allPayments = data.payments || [];
+      var term = parseInt(data.months) || allPayments.length;
+      var payments = allPayments.slice(0, term);
+
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
@@ -1077,7 +1089,6 @@
         '<div class="dash-stat highlight">' +
           '<div class="dash-stat-label">Остаток долга</div>' +
           '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
-          '<div class="dash-stat-sub">из ' + fmtNum(data.price) + ' ₽</div>' +
         '</div>' +
         '<div class="dash-stat">' +
           '<div class="dash-stat-label">Следующий платёж</div>' +
@@ -1100,6 +1111,7 @@
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
         row('Клиент', data.name) +
         row('Товар', data.product) +
+        row('Общая стоимость', fmtNum(data.price) + ' ₽') +
         row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
         row('Ежемесячный платёж', fmtNum(data.monthly) + ' ₽') +
         row('Срок', data.months + ' мес.');
