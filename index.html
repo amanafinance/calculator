@@ -276,7 +276,9 @@
     .payment-status.upcoming { color: var(--text-muted); }
     .payment-status.partial { color: #f0a500; }
 
-    .logout-btn { display: block; width: calc(100% - 32px); margin: 0 16px 16px; padding: 13px; background: var(--green-bg); color: var(--green-primary); border: 1.5px solid rgba(17,92,48,0.15); border-radius: var(--radius-md); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; }
+    .logout-btn { display: block; width: calc(100% - 32px); margin: 0 16px 8px; padding: 13px; background: var(--green-bg); color: var(--green-primary); border: 1.5px solid rgba(17,92,48,0.15); border-radius: var(--radius-md); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; }
+    .refresh-btn { display: block; width: calc(100% - 32px); margin: 0 16px 16px; padding: 13px; background: var(--green-primary); color: white; border: none; border-radius: var(--radius-md); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; transition: opacity 0.2s; }
+    .refresh-btn:active { opacity: 0.85; }
     .loader { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; display: none; }
     .loader.visible { display: block; }
 
@@ -545,6 +547,7 @@
           <div class="dash-card-title">График ежемесячных платежей</div>
           <div class="payments-list" id="paymentsList"></div>
         </div>
+        <button class="refresh-btn" onclick="doRefresh()">↻ Обновить данные</button>
         <button class="logout-btn" onclick="doLogout()">Выйти из кабинета</button>
       </div>
 
@@ -712,6 +715,26 @@
           '</div>';
       });
       document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
+    }
+
+    function doRefresh() {
+      var contract = document.getElementById('inputContract').value.trim();
+      var phone    = document.getElementById('inputPhone').value.replace(/\D/g, '');
+      var btn      = document.querySelector('.refresh-btn');
+      btn.textContent = 'Загрузка...';
+      btn.disabled = true;
+      fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+          btn.textContent = '↻ Обновить данные';
+          btn.disabled = false;
+          if (data.error) return;
+          showDashboard(data);
+        })
+        .catch(function() {
+          btn.textContent = '↻ Обновить данные';
+          btn.disabled = false;
+        });
     }
 
     function doLogout() {
