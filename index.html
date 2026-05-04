@@ -558,12 +558,23 @@
 
 
   <script>
+    // ═══════════════════════════════════════════════════
+    // КОНФИГУРАЦИЯ
+    // ═══════════════════════════════════════════════════
+    const API_URL = 'https://script.google.com/macros/s/AKfycbybRqispPcNEXPnoUL_-AFR3HmNHT9uNyVeZ1T7w6UbMWqcyMRCSCC90Ji9ssG8O1RDow/exec';
+    var GLOBAL_CONTRACT = '';
+    var GLOBAL_PHONE = '';
+
+    // ═══════════════════════════════════════════════════
+    // КАЛЬКУЛЯТОР — данные тарифов
+    // ═══════════════════════════════════════════════════
     const markupWithDown     = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
     const markupWithoutDown  = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
     const markupNoDownPayment= {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
     const roundUpTo100 = v => Math.ceil(v / 100) * 100;
     const fmt = v => v.toLocaleString('ru-RU') + ' ₽';
     let selectedTariff = 'with';
+
     const priceEl     = document.getElementById('price');
     const monthsEl    = document.getElementById('months');
     const monthsVal   = document.getElementById('monthsValue');
@@ -581,6 +592,10 @@
     const resFinal    = document.getElementById('resFinal');
     const resMarkup   = document.getElementById('resMarkup');
     const resMarkupPct= document.getElementById('resMarkupPct');
+
+    // ═══════════════════════════════════════════════════
+    // КАЛЬКУЛЯТОР — обработчики
+    // ═══════════════════════════════════════════════════
     document.querySelectorAll('.segment-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
@@ -588,162 +603,10 @@
         selectedTariff = btn.dataset.tariff;
         const hint = document.getElementById('tariffHint');
         if (hint) hint.classList.add('hidden');
-    
-    // ═══ НАВИГАЦИЯ ═══
-    const API_URL = 'https://script.google.com/macros/s/AKfycbw3_hv7EYxHoHzZcJnfOzJ3481RIquXXh288-Lkb4uiytg4NNm3bHoCxWj4lkXDbLGf/exec'; // ← сюда вставить URL из Google Apps Script
-
-    function switchPage(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('page-' + page).classList.add('active');
-      document.getElementById('nav-' + page).classList.add('active');
-      // Показываем/скрываем нижнюю панель калькулятора
-      document.querySelector('.sticky-bar').style.display = page === 'calc' ? 'flex' : 'none';
-      window.scrollTo(0, 0);
-    }
-
-    // ═══ ЛОГИН ═══
-    function doLogin() {
-      var contract = document.getElementById('inputContract').value.trim();
-      var phone    = document.getElementById('inputPhone').value.replace(/\D/g, '');
-      var err      = document.getElementById('loginError');
-      var loader   = document.getElementById('loginLoader');
-      err.classList.remove('visible');
-      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и номер телефона.'; err.classList.add('visible'); return; }
-      loader.classList.add('visible');
-      document.getElementById('loginSection').style.opacity = '0.4';
-      fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
-        .then(r => r.json())
-        .then(data => {
-          loader.classList.remove('visible');
-          document.getElementById('loginSection').style.opacity = '1';
-          if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
-          GLOBAL_CONTRACT = contract;
-          GLOBAL_PHONE = phone;
-          showDashboard(data);
-        })
-        .catch(() => {
-          loader.classList.remove('visible');
-          document.getElementById('loginSection').style.opacity = '1';
-          err.textContent = 'Ошибка соединения. Попробуйте позже.'; err.classList.add('visible');
-        });
-    }
-
-    function showDashboard(data) {
-      // Обрезаем платежи по реальному сроку клиента
-      var allPayments = data.payments || [];
-      var term = parseInt(data.months) || allPayments.length;
-      var payments = allPayments.slice(0, term);
-
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('dashboardSection').classList.add('visible');
-
-      var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
-      var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
-      var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
-      var overdueSum  = 0;
-      payments.forEach(function(p) {
-        if (p.status === 'просрочен' || p.status === 'частично') {
-          overdueSum += (p.amount - p.paid);
-        }
-      });
-
-      document.getElementById('dashStats').innerHTML =
-        '<div class="dash-stat highlight">' +
-          '<div class="dash-stat-label">Остаток долга</div>' +
-          '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
-        '</div>' +
-        '<div class="dash-stat" style="' + (overdueSum > 0 ? 'border:2px solid #e84245' : '') + '">' +
-          '<div class="dash-stat-label" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">Просрочка</div>' +
-          '<div class="dash-stat-value" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">' + fmtNum(overdueSum) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (overdueSum > 0 ? 'Требует оплаты' : 'Просрочек нет') + '</div>' +
-        '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Оплачено</div>' +
-          '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
-          '<div class="dash-stat-sub">платежей</div>' +
-        '</div>' +
-'';
-
-      document.getElementById('dashInfo').innerHTML =
-        '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
-        row('Клиент', data.name) +
-        (data.guarantor ? row('Поручитель', data.guarantor) : '') +
-        row('Товар', data.product) +
-        row('Общая стоимость', fmtNum(data.price) + ' ₽') +
-        row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
-        row('Срок', data.months + ' мес.');
-
-      var html = '';
-      payments.forEach(function(p) {
-        var today = new Date(); today.setHours(0,0,0,0);
-        var parts = p.date.split('.'); 
-        var pDate = new Date(parts[2], parts[1]-1, parts[0]);
-        var dateIsPast = pDate <= today;
-        var dotClass, statusLabel;
-
-        if (p.status === 'оплачен') {
-          dotClass = 'paid';
-          statusLabel = 'Оплачен';
-        } else if (p.status === 'частично_будущее') {
-          // Частично оплачен, срок не прошёл — жёлтый, не просрочка
-          dotClass = 'partial';
-          statusLabel = 'Частично оплачен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (p.status === 'частично') {
-          // Дата прошла, оплачена часть — красный
-          dotClass = 'overdue';
-          statusLabel = 'Частично просрочен (' + fmtNum(p.amount - p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (p.status === 'просрочен') {
-          dotClass = 'overdue';
-          statusLabel = 'Просрочен';
-        } else {
-          dotClass = 'upcoming';
-          statusLabel = 'Ожидается';
-        }
-
-        html +=
-          '<div class="payment-row">' +
-            '<div class="payment-dot ' + dotClass + '"></div>' +
-            '<div class="payment-info">' +
-              '<div class="payment-month">' + p.month + '</div>' +
-            '</div>' +
-            '<div class="payment-right">' +
-              '<div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div>' +
-              '<div class="payment-status ' + dotClass + '">' + statusLabel + '</div>' +
-            '</div>' +
-          '</div>';
-      });
-      document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
-    }
-
-    function doLogout() {
-      document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('loginSection').style.opacity = '1';
-      document.getElementById('dashboardSection').classList.remove('visible');
-      document.getElementById('inputContract').value = '';
-      document.getElementById('inputPhone').value = '';
-      document.getElementById('loginError').classList.remove('visible');
-      document.getElementById('dashStats').innerHTML = '';
-      document.getElementById('dashInfo').innerHTML = '';
-      document.getElementById('paymentsList').innerHTML = '';
-    }
-
-    function row(label, val) {
-      return '<div class="dash-info-row"><span class="dash-info-label">' + label + '</span><span class="dash-info-value">' + (val || '—') + '</span></div>';
-    }
-
-    function fmtNum(n) {
-      return (parseFloat(n) || 0).toLocaleString('ru-RU');
-    }
-
-    // Enter для логина
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && document.getElementById('page-contract').classList.contains('active')) doLogin();
-    });
-
-    calculate(true);
+        calculate(true);
       });
     });
+
     priceEl.addEventListener('input', () => {
       const raw = priceEl.value.replace(/\D/g, '');
       const cursor = priceEl.selectionStart;
@@ -752,162 +615,11 @@
       priceEl.value = formatted;
       const diff = formatted.length - oldLen;
       priceEl.setSelectionRange(cursor + diff, cursor + diff);
-  
-    // ═══ НАВИГАЦИЯ ═══
-    const API_URL = 'https://script.google.com/macros/s/AKfycbw3_hv7EYxHoHzZcJnfOzJ3481RIquXXh288-Lkb4uiytg4NNm3bHoCxWj4lkXDbLGf/exec'; // ← сюда вставить URL из Google Apps Script
-
-    function switchPage(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('page-' + page).classList.add('active');
-      document.getElementById('nav-' + page).classList.add('active');
-      // Показываем/скрываем нижнюю панель калькулятора
-      document.querySelector('.sticky-bar').style.display = page === 'calc' ? 'flex' : 'none';
-      window.scrollTo(0, 0);
-    }
-
-    // ═══ ЛОГИН ═══
-    function doLogin() {
-      var contract = document.getElementById('inputContract').value.trim();
-      var phone    = document.getElementById('inputPhone').value.replace(/\D/g, '');
-      var err      = document.getElementById('loginError');
-      var loader   = document.getElementById('loginLoader');
-      err.classList.remove('visible');
-      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и номер телефона.'; err.classList.add('visible'); return; }
-      loader.classList.add('visible');
-      document.getElementById('loginSection').style.opacity = '0.4';
-      fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
-        .then(r => r.json())
-        .then(data => {
-          loader.classList.remove('visible');
-          document.getElementById('loginSection').style.opacity = '1';
-          if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
-          GLOBAL_CONTRACT = contract;
-          GLOBAL_PHONE = phone;
-          showDashboard(data);
-        })
-        .catch(() => {
-          loader.classList.remove('visible');
-          document.getElementById('loginSection').style.opacity = '1';
-          err.textContent = 'Ошибка соединения. Попробуйте позже.'; err.classList.add('visible');
-        });
-    }
-
-    function showDashboard(data) {
-      // Обрезаем платежи по реальному сроку клиента
-      var allPayments = data.payments || [];
-      var term = parseInt(data.months) || allPayments.length;
-      var payments = allPayments.slice(0, term);
-
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('dashboardSection').classList.add('visible');
-
-      var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
-      var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
-      var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
-      var overdueSum  = 0;
-      payments.forEach(function(p) {
-        if (p.status === 'просрочен' || p.status === 'частично') {
-          overdueSum += (p.amount - p.paid);
-        }
-      });
-
-      document.getElementById('dashStats').innerHTML =
-        '<div class="dash-stat highlight">' +
-          '<div class="dash-stat-label">Остаток долга</div>' +
-          '<div class="dash-stat-value">' + fmtNum(data.balance) + ' ₽</div>' +
-        '</div>' +
-        '<div class="dash-stat" style="' + (overdueSum > 0 ? 'border:2px solid #e84245' : '') + '">' +
-          '<div class="dash-stat-label" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">Просрочка</div>' +
-          '<div class="dash-stat-value" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">' + fmtNum(overdueSum) + ' ₽</div>' +
-          '<div class="dash-stat-sub">' + (overdueSum > 0 ? 'Требует оплаты' : 'Просрочек нет') + '</div>' +
-        '</div>' +
-        '<div class="dash-stat">' +
-          '<div class="dash-stat-label">Оплачено</div>' +
-          '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
-          '<div class="dash-stat-sub">платежей</div>' +
-        '</div>' +
-'';
-
-      document.getElementById('dashInfo').innerHTML =
-        '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
-        row('Клиент', data.name) +
-        (data.guarantor ? row('Поручитель', data.guarantor) : '') +
-        row('Товар', data.product) +
-        row('Общая стоимость', fmtNum(data.price) + ' ₽') +
-        row('Первый взнос', fmtNum(data.prepay) + ' ₽') +
-        row('Срок', data.months + ' мес.');
-
-      var html = '';
-      payments.forEach(function(p) {
-        var today = new Date(); today.setHours(0,0,0,0);
-        var parts = p.date.split('.'); 
-        var pDate = new Date(parts[2], parts[1]-1, parts[0]);
-        var dateIsPast = pDate <= today;
-        var dotClass, statusLabel;
-
-        if (p.status === 'оплачен') {
-          dotClass = 'paid';
-          statusLabel = 'Оплачен';
-        } else if (p.status === 'частично_будущее') {
-          // Частично оплачен, срок не прошёл — жёлтый, не просрочка
-          dotClass = 'partial';
-          statusLabel = 'Частично оплачен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (p.status === 'частично') {
-          // Дата прошла, оплачена часть — красный
-          dotClass = 'overdue';
-          statusLabel = 'Частично просрочен (' + fmtNum(p.amount - p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
-        } else if (p.status === 'просрочен') {
-          dotClass = 'overdue';
-          statusLabel = 'Просрочен';
-        } else {
-          dotClass = 'upcoming';
-          statusLabel = 'Ожидается';
-        }
-
-        html +=
-          '<div class="payment-row">' +
-            '<div class="payment-dot ' + dotClass + '"></div>' +
-            '<div class="payment-info">' +
-              '<div class="payment-month">' + p.month + '</div>' +
-            '</div>' +
-            '<div class="payment-right">' +
-              '<div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div>' +
-              '<div class="payment-status ' + dotClass + '">' + statusLabel + '</div>' +
-            '</div>' +
-          '</div>';
-      });
-      document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
-    }
-
-    function doLogout() {
-      document.getElementById('loginSection').style.display = 'block';
-      document.getElementById('loginSection').style.opacity = '1';
-      document.getElementById('dashboardSection').classList.remove('visible');
-      document.getElementById('inputContract').value = '';
-      document.getElementById('inputPhone').value = '';
-      document.getElementById('loginError').classList.remove('visible');
-      document.getElementById('dashStats').innerHTML = '';
-      document.getElementById('dashInfo').innerHTML = '';
-      document.getElementById('paymentsList').innerHTML = '';
-    }
-
-    function row(label, val) {
-      return '<div class="dash-info-row"><span class="dash-info-label">' + label + '</span><span class="dash-info-value">' + (val || '—') + '</span></div>';
-    }
-
-    function fmtNum(n) {
-      return (parseFloat(n) || 0).toLocaleString('ru-RU');
-    }
-
-    // Enter для логина
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && document.getElementById('page-contract').classList.contains('active')) doLogin();
+      calculate(true);
     });
 
-    calculate(true);
-    });
     monthsEl.addEventListener('input', () => { updateSliderFill(monthsEl); calculate(true); });
+
     prepaySlider.addEventListener('input', () => {
       const min = parseInt(prepaySlider.min);
       const max = parseInt(prepaySlider.max);
@@ -924,6 +636,7 @@
       updateSliderFill(prepaySlider);
       calculate(false);
     });
+
     prepayInput.addEventListener('input', () => {
       const raw = prepayInput.value.replace(/\D/g, '');
       if (!raw) { prepayInput.value = ''; prepayError.classList.remove('visible'); return; }
@@ -955,6 +668,7 @@
         prepayError.classList.add('visible');
       }
     });
+
     function updateSliderFill(slider) {
       const min = parseInt(slider.min) || 0;
       const max = parseInt(slider.max) || 100;
@@ -962,11 +676,13 @@
       const pct = ((val - min) / (max - min)) * 100;
       slider.style.background = `linear-gradient(to right, var(--green-primary) 0%, var(--green-primary) ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
     }
+
     function monthWord(n) {
       if (n === 1) return 'месяц';
       if (n >= 2 && n <= 4) return 'месяца';
       return 'месяцев';
     }
+
     function updateMonthsUI(months, maxMonths) {
       const labels = maxMonths === 6 ? [3,4,5,6] : maxMonths === 9 ? [3,6,9] : [3,6,9,12];
       monthsTicks.innerHTML = labels.map(l =>
@@ -974,6 +690,7 @@
       ).join('');
       monthsVal.textContent = `${months} ${monthWord(months)}`;
     }
+
     const _counters = {};
     function setVal(el, text) {
       const newNum = parseFloat(text.replace(/[^\d,.]/g, '').replace(',', '.')) || 0;
@@ -994,11 +711,13 @@
       }
       el._raf = requestAnimationFrame(tick);
     }
+
     function togglePrepay(show) {
       const block = document.getElementById('prepayBlock');
       if (show) block.classList.remove('hiding');
       else block.classList.add('hiding');
     }
+
     function calculate(resetPrepay = false) {
       const raw = priceEl.value.replace(/\D/g, '');
       const price = parseInt(raw) || 0;
@@ -1073,7 +792,7 @@
       if (stickyMonthly) stickyMonthly.textContent = fmt(monthly);
       const tariffLabel = selectedTariff === 'with' ? 'С первым взносом' : 'Без первого взноса';
       const msgLines = [
-        '*Здравствуйте, хочу оформить рассрочку* 🤝',
+        '*Здравствуйте, хочу оформить рассрочку*',
         `- Стоимость товара: *${price.toLocaleString('ru-RU')} ₽*`,
         `- Тариф: *${tariffLabel}*`,
         `- Срок: *${months} ${monthWord(months)}*`,
@@ -1086,48 +805,57 @@
       whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(msgLines.join('\n'))}`;
     }
 
-    // ═══ НАВИГАЦИЯ ═══
-    const API_URL = 'https://script.google.com/macros/s/AKfycbw3_hv7EYxHoHzZcJnfOzJ3481RIquXXh288-Lkb4uiytg4NNm3bHoCxWj4lkXDbLGf/exec'; // ← сюда вставить URL из Google Apps Script
-
+    // ═══════════════════════════════════════════════════
+    // НАВИГАЦИЯ
+    // ═══════════════════════════════════════════════════
     function switchPage(page) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.getElementById('page-' + page).classList.add('active');
       document.getElementById('nav-' + page).classList.add('active');
-      // Показываем/скрываем нижнюю панель калькулятора
       document.querySelector('.sticky-bar').style.display = page === 'calc' ? 'flex' : 'none';
       window.scrollTo(0, 0);
     }
 
-    // ═══ ЛОГИН ═══
+    // ═══════════════════════════════════════════════════
+    // ЛИЧНЫЙ КАБИНЕТ — ЛОГИН
+    // ═══════════════════════════════════════════════════
     function doLogin() {
       var contract = document.getElementById('inputContract').value.trim();
       var phone    = document.getElementById('inputPhone').value.replace(/\D/g, '');
       var err      = document.getElementById('loginError');
       var loader   = document.getElementById('loginLoader');
       err.classList.remove('visible');
-      if (!contract || phone.length < 10) { err.textContent = 'Введите номер договора и номер телефона.'; err.classList.add('visible'); return; }
+      if (!contract || phone.length < 10) {
+        err.textContent = 'Введите номер договора и номер телефона.';
+        err.classList.add('visible');
+        return;
+      }
       loader.classList.add('visible');
       document.getElementById('loginSection').style.opacity = '0.4';
       fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
-        .then(r => r.json())
-        .then(data => {
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
-          if (data.error) { err.textContent = 'Неверный номер договора или телефон'; err.classList.add('visible'); return; }
+          if (data.error) {
+            err.textContent = data.error;
+            err.classList.add('visible');
+            return;
+          }
           GLOBAL_CONTRACT = contract;
           GLOBAL_PHONE = phone;
           showDashboard(data);
         })
-        .catch(() => {
+        .catch(function() {
           loader.classList.remove('visible');
           document.getElementById('loginSection').style.opacity = '1';
-          err.textContent = 'Ошибка соединения. Попробуйте позже.'; err.classList.add('visible');
+          err.textContent = 'Ошибка соединения. Попробуйте позже.';
+          err.classList.add('visible');
         });
     }
 
     function showDashboard(data) {
-      // Обрезаем платежи по реальному сроку клиента
       var allPayments = data.payments || [];
       var term = parseInt(data.months) || allPayments.length;
       var payments = allPayments.slice(0, term);
@@ -1135,10 +863,8 @@
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('dashboardSection').classList.add('visible');
 
-      var paidCount   = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
-      var overdueCount= payments.filter(function(p){ return p.status === 'просрочен'; }).length;
-      var nextP       = payments.find(function(p){ return p.status === 'ожидается'; });
-      var overdueSum  = 0;
+      var paidCount = payments.filter(function(p){ return p.status === 'оплачен'; }).length;
+      var overdueSum = 0;
       payments.forEach(function(p) {
         if (p.status === 'просрочен' || p.status === 'частично') {
           overdueSum += (p.amount - p.paid);
@@ -1159,8 +885,7 @@
           '<div class="dash-stat-label">Оплачено</div>' +
           '<div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div>' +
           '<div class="dash-stat-sub">платежей</div>' +
-        '</div>' +
-'';
+        '</div>';
 
       document.getElementById('dashInfo').innerHTML =
         '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
@@ -1173,21 +898,14 @@
 
       var html = '';
       payments.forEach(function(p) {
-        var today = new Date(); today.setHours(0,0,0,0);
-        var parts = p.date.split('.'); 
-        var pDate = new Date(parts[2], parts[1]-1, parts[0]);
-        var dateIsPast = pDate <= today;
         var dotClass, statusLabel;
-
         if (p.status === 'оплачен') {
           dotClass = 'paid';
           statusLabel = 'Оплачен';
         } else if (p.status === 'частично_будущее') {
-          // Частично оплачен, срок не прошёл — жёлтый, не просрочка
           dotClass = 'partial';
           statusLabel = 'Частично оплачен (' + fmtNum(p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
         } else if (p.status === 'частично') {
-          // Дата прошла, оплачена часть — красный
           dotClass = 'overdue';
           statusLabel = 'Частично просрочен (' + fmtNum(p.amount - p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)';
         } else if (p.status === 'просрочен') {
@@ -1197,7 +915,6 @@
           dotClass = 'upcoming';
           statusLabel = 'Ожидается';
         }
-
         html +=
           '<div class="payment-row">' +
             '<div class="payment-dot ' + dotClass + '"></div>' +
@@ -1223,6 +940,31 @@
       document.getElementById('dashStats').innerHTML = '';
       document.getElementById('dashInfo').innerHTML = '';
       document.getElementById('paymentsList').innerHTML = '';
+      GLOBAL_CONTRACT = '';
+      GLOBAL_PHONE = '';
+    }
+
+    function doRefresh() {
+      var contract = GLOBAL_CONTRACT || document.getElementById('inputContract').value.trim();
+      var phone    = GLOBAL_PHONE    || document.getElementById('inputPhone').value.replace(/\D/g, '');
+      var btn = document.querySelector('.refresh-btn');
+      if (!contract || !phone) return;
+      btn.textContent = 'Загрузка...';
+      btn.disabled = true;
+      fetch(API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
+        .then(function(r){ return r.json(); })
+        .then(function(data) {
+          btn.textContent = '↻ Обновить данные';
+          btn.disabled = false;
+          if (data.error) return;
+          GLOBAL_CONTRACT = contract;
+          GLOBAL_PHONE = phone;
+          showDashboard(data);
+        })
+        .catch(function() {
+          btn.textContent = '↻ Обновить данные';
+          btn.disabled = false;
+        });
     }
 
     function row(label, val) {
@@ -1238,14 +980,17 @@
       if (e.key === 'Enter' && document.getElementById('page-contract').classList.contains('active')) doLogin();
     });
 
+    // ═══════════════════════════════════════════════════
+    // ИНИЦИАЛИЗАЦИЯ
+    // ═══════════════════════════════════════════════════
     calculate(true);
     const wrapper = document.querySelector('.app-wrapper');
     document.fonts.ready.then(() => wrapper.classList.add('fonts-loaded'));
     setTimeout(() => wrapper.classList.add('fonts-loaded'), 800);
   </script>
 
-  <!-- ═══ НИЖНЯЯ НАВИГАЦИЯ ═══ -->
-  <nav class="bottom-nav">
+
+    <nav class="bottom-nav">
     <button class="nav-item active" id="nav-calc" onclick="switchPage('calc')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
@@ -1260,33 +1005,5 @@
     </button>
   </nav>
 
-  <script>
-    var GLOBAL_API_URL = 'https://script.google.com/macros/s/AKfycbw3_hv7EYxHoHzZcJnfOzJ3481RIquXXh288-Lkb4uiytg4NNm3bHoCxWj4lkXDbLGf/exec';
-    var GLOBAL_CONTRACT = '';
-    var GLOBAL_PHONE = '';
-
-    function doRefresh() {
-      var contract = GLOBAL_CONTRACT || document.getElementById('inputContract').value.trim();
-      var phone    = GLOBAL_PHONE    || document.getElementById('inputPhone').value.replace(/\D/g, '');
-      var btn = document.querySelector('.refresh-btn');
-      if (!contract || !phone) return;
-      btn.textContent = 'Загрузка...';
-      btn.disabled = true;
-      fetch(GLOBAL_API_URL + '?contract=' + encodeURIComponent(contract) + '&phone=' + encodeURIComponent(phone))
-        .then(function(r){ return r.json(); })
-        .then(function(data) {
-          btn.textContent = '↻ Обновить данные';
-          btn.disabled = false;
-          if (data.error) return;
-          GLOBAL_CONTRACT = contract;
-          GLOBAL_PHONE = phone;
-          showDashboard(data);
-        })
-        .catch(function() {
-          btn.textContent = '↻ Обновить данные';
-          btn.disabled = false;
-        });
-    }
-  </script>
 </body>
 </html>
