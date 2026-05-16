@@ -77,9 +77,15 @@
     .tariff-hint.hidden { opacity: 0; pointer-events: none; }
     .tariff-hint svg { animation: arrowBounce 1s ease-in-out infinite; }
     @keyframes arrowBounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(4px); } }
-    .segment-wrap { background: var(--green-bg); border-radius: var(--radius-md); padding: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 24px; }
+    .segment-wrap { background: var(--green-bg); border-radius: var(--radius-md); padding: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 0; }
     .segment-btn { padding: 12px 8px; border-radius: var(--radius-sm); border: none; background: transparent; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.25s ease; text-align: center; line-height: 1.3; }
     .segment-btn.active { background: white; color: var(--green-primary); box-shadow: 0 2px 8px rgba(17,92,48,0.14); }
+    .tariff-conds{visibility:hidden;opacity:0;height:0;overflow:hidden;transition:opacity 0.2s ease,visibility 0.2s ease}
+    .tariff-conds.open{visibility:visible;opacity:1;height:auto;overflow:visible;margin-top:8px;margin-bottom:16px}
+    .tariff-conds-inner{padding:10px 14px;background:rgba(17,92,48,0.04);border-radius:8px;border:1px solid rgba(17,92,48,0.08)}
+    .tc-title{font-size:10px;font-weight:700;color:var(--green-primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+    .tc-item{font-size:12px;font-weight:500;color:var(--text-secondary);display:flex;align-items:center;gap:7px;padding:3px 0}
+    .tc-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--green-light);flex-shrink:0}
     .section-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
     .field-wrap { margin-bottom: 20px; }
     .field-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -393,18 +399,29 @@
         </div>
       </div>
       <div class="card-body">
-        <div class="tariff-hint" id="tariffHint">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-          Выберите подходящий тариф
-        </div>
+        <div class="section-label" style="text-align:center">Тарифы</div>
         <div class="segment-wrap">
           <button class="segment-btn active" data-tariff="with">С первым взносом</button>
           <button class="segment-btn" data-tariff="without">Без первого взноса</button>
         </div>
+        <div class="tariff-conds open" id="tariffCondsWith"><div class="tariff-conds-inner">
+          <div class="tc-title">Условия тарифа</div>
+          <div class="tc-item">До 250 000₽ — 1 поручитель муж. пола</div>
+          <div class="tc-item">От 250 000₽ — 2 поручителя муж. пола</div>
+          <div class="tc-item">Возраст покупателя и поручителя от 22 лет</div>
+          <div class="tc-item">Прописка в ЧР</div>
+        </div></div>
+        <div class="tariff-conds" id="tariffCondsWithout"><div class="tariff-conds-inner">
+          <div class="tc-title">Условия тарифа</div>
+          <div class="tc-item">До 100 000₽ — 1 поручитель муж. пола</div>
+          <div class="tc-item">От 100 000₽ — 2 поручителя муж. пола</div>
+          <div class="tc-item">Возраст покупателя и поручителя от 22 лет</div>
+          <div class="tc-item">Прописка в ЧР</div>
+        </div></div>
         <div class="field-wrap">
           <div class="field-label">
             Стоимость товара
-            <span class="field-hint">от 30 000 ₽</span>
+            <span class="field-hint" id="priceHint">от 30 000 до 1 500 000 ₽</span>
           </div>
           <div class="input-box">
             <input type="text" inputmode="numeric" id="price" placeholder="0" autocomplete="off" />
@@ -458,16 +475,9 @@
             <div class="result-card-sub" id="resMarkupPct">0%</div>
           </div>
         </div>
-        <div class="req-block">
-          <div class="req-label">Обязательные требования</div>
-          <div class="req-list">
-            <div class="req-item">Покупатель 22–60 лет</div>
-            <div class="req-item">Поручитель муж. пола 25–60 лет</div>
-            <div class="req-item">Паспорт обоих лиц (лицевая + прописка)</div>
-            <div class="req-item">Фактический адрес проживания</div>
-          </div>
-        </div>
-        <div class="contact-icons">
+        <div class="contact-icons" style="flex-direction:column;align-items:center;gap:14px">
+          <div class="section-label" style="margin-bottom:0">Связаться с нами</div>
+          <div style="display:flex;gap:20px">
           <a class="contact-icon" href="https://wa.me/79280222114" target="_blank" aria-label="WhatsApp">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.054 23.25a.75.75 0 00.916.916l5.395-1.478A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.71 9.71 0 01-4.951-1.355l-.355-.212-3.684 1.008 1.008-3.684-.212-.355A9.71 9.71 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
           </a>
@@ -477,6 +487,7 @@
           <a class="contact-icon" href="https://instagram.com/amana_fin" target="_blank" aria-label="Instagram">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
           </a>
+          </div>
         </div>
       </div>
     </div>
@@ -571,6 +582,7 @@
     const markupWithDown     = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
     const markupWithoutDown  = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
     const markupNoDownPayment= {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
+    const tariffLimits = { with: {min:30000,max:1500000,label:'от 30 000 до 1 500 000 ₽'}, without: {min:30000,max:500000,label:'от 30 000 до 500 000 ₽'} };
     const roundUpTo100 = v => Math.ceil(v / 100) * 100;
     const fmt = v => v.toLocaleString('ru-RU') + ' ₽';
     let selectedTariff = 'with';
@@ -601,8 +613,9 @@
         document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedTariff = btn.dataset.tariff;
-        const hint = document.getElementById('tariffHint');
-        if (hint) hint.classList.add('hidden');
+        document.getElementById('tariffCondsWith').classList.toggle('open', selectedTariff === 'with');
+        document.getElementById('tariffCondsWithout').classList.toggle('open', selectedTariff === 'without');
+        document.getElementById('priceHint').textContent = tariffLimits[selectedTariff].label;
         calculate(true);
       });
     });
@@ -721,6 +734,7 @@
     function calculate(resetPrepay = false) {
       const raw = priceEl.value.replace(/\D/g, '');
       const price = parseInt(raw) || 0;
+      const limits = tariffLimits[selectedTariff];
       let maxMonths = 12;
       if (price >= 1 && price <= 49999) maxMonths = 6;
       else if (price >= 50000 && price <= 99999) maxMonths = 9;
@@ -743,8 +757,10 @@
         whatsappBtn.href = 'https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.';
         return;
       }
-      if (price < 30000) {
-        priceError.textContent = 'Стоимость товара должна быть не менее 30 000₽';
+      if (price < limits.min || price > limits.max) {
+        priceError.textContent = price < limits.min
+          ? 'Минимальная сумма — ' + limits.min.toLocaleString('ru-RU') + ' ₽'
+          : 'Максимальная сумма по этому тарифу — ' + limits.max.toLocaleString('ru-RU') + ' ₽';
         priceError.classList.add('visible');
         resMonthly.textContent = '— ₽'; resPrepay.textContent = '— ₽';
         resFinal.textContent = '— ₽'; resMarkup.textContent = '— ₽';
