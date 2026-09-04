@@ -27,9 +27,10 @@
       --radius-xl: 20px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Manrope', sans-serif; background: #f2f6f4; min-height: 100vh; overflow-x: hidden; }
+    html { background: rgb(8,50,25); scroll-behavior: smooth; }
+    body { font-family: 'Manrope', sans-serif; background: rgb(8,50,25); min-height: 100vh; overflow-x: hidden; overscroll-behavior-y: none; }
 
-    .app-wrapper { width: 100%; max-width: 480px; margin: 0 auto; opacity: 0; transition: opacity 0.15s ease; }
+    .app-wrapper { width: 100%; max-width: 480px; margin: 0 auto; background: #f2f6f4; opacity: 0; transition: opacity 0.15s ease; }
     .app-wrapper.fonts-loaded { opacity: 1; }
 
     /* ─── GLASSMORPHISM HEADER ─── */
@@ -53,6 +54,13 @@
       color: #ffffff; letter-spacing: 3px;
     }
     .header-actions { display: flex; align-items: center; gap: 10px; }
+    .header-nav { display: none; align-items: center; gap: 4px; margin-right: 6px; }
+    .header-nav a {
+      padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.78); cursor: pointer; text-decoration: none; transition: all 0.18s;
+    }
+    .header-nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .header-nav a.active { background: rgba(149,193,31,0.18); color: rgb(149,193,31); }
     .header-phone { font-size: 13px; font-weight: 700; color: white; text-decoration: none; }
     .header-icon {
       width: 30px; height: 30px; border-radius: 50%;
@@ -63,9 +71,10 @@
 
     /* ─── PAGE SYSTEM ─── */
     .page { display: none; }
+    #calc, #form { scroll-margin-top: 60px; }
     .page.active { display: block; }
-    #page-calc { padding-top: 56px; padding-bottom: 90px; }
-    #page-contract { padding-top: 56px; padding-bottom: 90px; }
+    #page-calc { padding-top: 56px; padding-bottom: 0; }
+    #page-contract { padding-top: 56px; padding-bottom: 40px; }
 
     /* ─── HERO SECTION ─── */
     .hero-section {
@@ -82,17 +91,21 @@
     .hero-inner { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; }
     .hero-text { flex: 1; max-width: 100%; }
     .hero-eyebrow { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 10px; }
-    .hero-title { font-size: 34px; font-weight: 800; color: white; line-height: 1.15; letter-spacing: -1px; text-shadow: 0 1px 6px rgba(0,0,0,0.15); }
+    .hero-title { font-size: 31px; font-weight: 800; color: white; line-height: 1.15; letter-spacing: -1px; text-shadow: 0 1px 6px rgba(0,0,0,0.15); }
     .hero-title em { font-style: normal; color: var(--green-light); }
+    .hero-title .nowrap { white-space: nowrap; }
     .hero-tagline { margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; line-height: 1.5; }
     .hero-logo-wrap { flex-shrink: 0; margin-left: 8px; }
     .hero-logo { width: 105px; height: 105px; object-fit: contain; animation: float 3.5s ease-in-out infinite; will-change: transform; }
-    .hero-chips { display: flex; gap: 7px; margin-top: 20px; flex-wrap: wrap; position: relative; z-index: 2; }
-    .hero-chip {
-      font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.92); padding: 5px 11px; border-radius: 20px;
-      border: 1px solid rgba(149,193,31,0.35); white-space: nowrap;
+    .hero-cta { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; position: relative; z-index: 2; }
+    .hero-btn {
+      display: block; width: 100%; text-align: center; padding: 13px 16px; border-radius: var(--radius-md);
+      font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700;
+      text-decoration: none; white-space: nowrap; transition: all 0.2s;
     }
+    .hero-btn:active { transform: scale(0.97); }
+    .hero-btn-primary { background: var(--green-light); color: #1c2b0a; }
+    .hero-btn-ghost { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.28); }
 
     /* ─── STEPS SECTION ─── */
     .steps-section { background: white; padding: 36px 20px; }
@@ -110,7 +123,7 @@
 
     /* ─── CALCULATOR SECTION ─── */
     .calc-section { background: var(--green-bg); padding: 36px 20px; }
-    .calc-card { background: white; border-radius: var(--radius-xl); padding: 24px 20px; box-shadow: var(--shadow-md); }
+    .calc-card { background: white; border-radius: var(--radius-xl); padding: 18px 16px; box-shadow: var(--shadow-md); }
 
     /* Calculator internals — same as before */
     .tariff-hint { display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--green-primary); margin-bottom: 10px; margin-top: -10px; opacity: 1; transition: opacity 0.4s ease; }
@@ -118,30 +131,30 @@
     .tariff-hint svg { animation: arrowBounce 1s ease-in-out infinite; }
     @keyframes arrowBounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(4px); } }
     .segment-wrap { background: var(--green-bg); border-radius: var(--radius-md); padding: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 0; }
-    .segment-btn { padding: 12px 8px; border-radius: var(--radius-sm); border: none; background: transparent; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.25s ease; text-align: center; line-height: 1.3; }
+    .segment-btn { padding: 11px 6px; border-radius: var(--radius-sm); border: none; background: transparent; font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.25s ease; text-align: center; line-height: 1.3; }
     .segment-btn.active { background: white; color: var(--green-primary); box-shadow: 0 2px 8px rgba(17,92,48,0.14); }
     .tariff-conds { display: none; }
-    .tariff-conds.open { display: block; margin-top: 8px; margin-bottom: 16px; }
-    .tariff-conds-inner { padding: 10px 14px; background: rgba(17,92,48,0.04); border-radius: 8px; border: 1px solid rgba(17,92,48,0.08); }
+    .tariff-conds.open { display: block; margin-top: 8px; margin-bottom: 12px; }
+    .tariff-conds-inner { padding: 9px 12px; background: rgba(17,92,48,0.04); border-radius: 8px; border: 1px solid rgba(17,92,48,0.08); }
     .tc-title { font-size: 10px; font-weight: 700; color: var(--green-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .tc-item { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 7px; padding: 3px 0; }
+    .tc-item { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 7px; padding: 1.5px 0; line-height: 1.35; }
     .tc-item::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--green-light); flex-shrink: 0; }
-    .section-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-    .field-wrap { margin-bottom: 20px; }
-    .field-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .field-wrap { margin-bottom: 14px; }
+    .field-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
     .field-hint { font-weight: 400; color: var(--text-muted); }
     .input-box { position: relative; }
-    .input-box input { width: 100%; padding: 14px 52px 14px 16px; font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-primary); background: var(--green-bg); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; transition: all 0.2s ease; }
+    .input-box input { width: 100%; padding: 12px 52px 12px 16px; font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-primary); background: var(--green-bg); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; transition: all 0.2s ease; }
     .input-box input:focus { border-color: var(--green-light); background: white; box-shadow: 0 0 0 4px rgba(149,193,31,0.1); }
     .input-currency { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; font-weight: 700; color: var(--text-muted); pointer-events: none; }
     .field-error { margin-top: 6px; font-size: 12px; font-weight: 500; color: #e84245; display: none; padding-left: 4px; }
     .field-error.visible { display: block; }
-    .months-control { margin-bottom: 20px; }
+    .months-control { margin-bottom: 14px; }
     input[type="range"].sber-slider { width: 100%; height: 4px; border-radius: 2px; appearance: none; background: var(--border); outline: none; cursor: pointer; }
     input[type="range"].sber-slider::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--green-primary); border: 3px solid white; box-shadow: 0 2px 8px rgba(17,92,48,0.3); cursor: pointer; transition: transform 0.15s ease; }
     input[type="range"].sber-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
     input[type="range"].sber-slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--green-primary); border: 3px solid white; box-shadow: 0 2px 8px rgba(17,92,48,0.3); cursor: pointer; }
-    .months-ticks { display: flex; justify-content: space-between; margin-top: 10px; }
+    .months-ticks { display: flex; justify-content: space-between; margin-top: 7px; }
     .months-tick { font-size: 12px; font-weight: 500; color: var(--text-muted); transition: color 0.2s, font-weight 0.2s; }
     .months-tick.active { color: var(--green-primary); font-weight: 700; }
     .prepay-slider-wrap { position: relative; }
@@ -149,13 +162,14 @@
     .prepay-input-wrap input { width: 100%; padding: 14px 52px 14px 16px; font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-primary); background: var(--green-bg); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; transition: all 0.2s ease; }
     .prepay-input-wrap input:focus { border-color: var(--green-light); background: white; box-shadow: 0 0 0 4px rgba(149,193,31,0.1); }
     .prepay-input-wrap .input-currency { font-size: 15px; }
-    .divider { height: 1px; background: var(--border); margin: 20px 0; }
-    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0; }
-    .result-card { background: var(--green-bg); border-radius: var(--radius-md); padding: 14px 16px; }
+    .divider { height: 1px; background: var(--border); margin: 14px 0; }
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 0; }
+    .result-card { background: var(--green-bg); border-radius: var(--radius-md); padding: 11px 13px; }
     .result-card.highlight { background: var(--green-primary); }
-    .result-card-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .result-card.highlight .result-card-value { font-size: 20px; }
+    .result-card-label { font-size: 10.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
     .result-card.highlight .result-card-label { color: rgba(255,255,255,0.65); }
-    .result-card-value { font-size: 20px; font-weight: 800; color: var(--green-primary); letter-spacing: -0.5px; }
+    .result-card-value { font-size: 18px; font-weight: 800; color: var(--green-primary); letter-spacing: -0.5px; }
     .result-card.highlight .result-card-value { color: white; }
     .result-card-sub { font-size: 11px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
     .result-card.highlight .result-card-sub { color: rgba(255,255,255,0.6); }
@@ -163,6 +177,14 @@
     #prepayBlock.hiding { max-height: 0; opacity: 0; margin-bottom: 0; overflow: hidden; }
 
     /* ─── CONDITIONS SECTION ─── */
+    .calc-wa-btn {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      margin-top: 16px; padding: 15px; border-radius: var(--radius-md);
+      background: var(--green-primary); color: #fff; text-decoration: none;
+      font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700; transition: all 0.2s;
+    }
+    .calc-wa-btn:active { transform: scale(0.98); opacity: 0.9; }
+
     .conds-section { background: white; padding: 36px 20px; }
     .conds-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .cond-card { background: var(--green-bg); border-radius: var(--radius-md); padding: 16px 14px; }
@@ -207,13 +229,6 @@
     .footer-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.07); border: 1px solid rgba(149,193,31,0.2); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.6); text-decoration: none; transition: background 0.2s; }
     .footer-icon:active { background: rgba(149,193,31,0.2); }
 
-    /* ─── STICKY BAR ─── */
-    .sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; gap: 12px; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(7, 42, 21, 0.80); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(149,193,31,0.22); }
-    .sticky-info { flex: 1; }
-    .sticky-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.8px; }
-    .sticky-amount { font-size: 22px; font-weight: 800; color: rgb(149,193,31); letter-spacing: -0.5px; margin-top: 1px; }
-    .sticky-wa-btn { display: flex; align-items: center; gap: 8px; padding: 13px 18px; border-radius: var(--radius-md); font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(149,193,31,0.3); color: rgb(149,193,31); white-space: nowrap; flex-shrink: 0; transition: background 0.2s; }
-    .sticky-wa-btn:active { background: rgba(149,193,31,0.2); }
 
     /* ─── BOTTOM NAV ─── */
 
@@ -342,38 +357,119 @@
 
     /* Маленькие телефоны */
     @media (max-width: 390px) {
-      .hero-title { font-size: 30px; }
+      .hero-title { font-size: 28px; }
       .conds-grid { gap: 10px; }
       .result-card-value { font-size: 18px; }
     }
     @media (max-width: 340px) {
-      .hero-title { font-size: 26px; }
+      .hero-title { font-size: 25px; }
       .result-card-value { font-size: 16px; }
-      .sticky-amount { font-size: 19px; }
-      .sticky-wa-btn { padding: 12px 14px; font-size: 13px; }
       .header-company-top, .header-company-bot { font-size: 11px; letter-spacing: 2px; }
       .section { padding: 28px 16px; }
       .steps-section, .calc-section, .conds-section, .form-section { padding: 28px 16px; }
     }
 
-    /* Планшеты и десктоп — центрированная колонка-приложение с рамкой */
-    @media (min-width: 481px) {
+    /* ─── ПЛАНШЕТЫ (481–999px): колонка-приложение с рамкой ─── */
+    @media (min-width: 481px) and (max-width: 999px) {
       body { background: #dde8e1; }
       .app-wrapper {
-        max-width: 480px;
-        min-height: 100vh;
-        background: #f2f6f4;
+        max-width: 480px; min-height: 100vh; background: #f2f6f4;
         box-shadow: 0 0 50px rgba(0,0,0,0.14);
       }
       .site-header { left: 50%; right: auto; transform: translateX(-50%); width: 480px; }
-      .sticky-bar { left: 50%; right: auto; transform: translateX(-50%); width: 480px; }
-      /* Меню-дропдаун ограничиваем по ширине колонки */
       .drawer { left: 50%; right: auto; width: 480px; margin-left: -240px; }
+      .hero-title { font-size: 34px; }
     }
 
-    /* Высокие экраны — чуть крупнее заголовок на десктопе */
-    @media (min-width: 481px) and (min-height: 700px) {
-      .hero-title { font-size: 36px; }
+    /* ═══════════ ВЕРСИЯ ДЛЯ ПК (от 1000px) ═══════════ */
+    @media (min-width: 1000px) {
+      body { background: #f2f6f4; }
+      .app-wrapper { max-width: none; background: #f2f6f4; }
+
+      /* хедер */
+      .site-header { height: 72px; padding: 0 40px; }
+      .header-logo { width: 54px; height: 54px; }
+      .header-company-top, .header-company-bot { font-size: 13px; }
+      .header-nav { display: flex; }
+      .hamburger-btn { display: none; }
+      .header-icon { width: 34px; height: 34px; }
+      #page-calc, #page-contract { padding-top: 72px; }
+      #calc, #form { scroll-margin-top: 76px; }
+
+      /* общий контейнер секций */
+      .hero-inner, .hero-cta,
+      .steps-section > *, .calc-section > *, .conds-section > *, .form-section > * {
+        max-width: 1140px; margin-left: auto; margin-right: auto;
+      }
+
+      /* HERO */
+      .hero-section { padding: 64px 40px 60px; }
+      .hero-title { font-size: 56px; letter-spacing: -2px; line-height: 1.06; }
+      .hero-section::before { width: 420px; height: 420px; top: -120px; right: -80px; }
+      .hero-ring-1 { width: 320px; height: 320px; right: 4%; top: -60px; }
+      .hero-ring-2 { width: 420px; height: 420px; right: -2%; top: -110px; }
+      .hero-cta { flex-direction: row; gap: 12px; margin-top: 28px; }
+      .hero-btn { display: inline-block; width: auto; padding: 15px 30px; font-size: 15px; }
+
+      /* заголовки секций по центру */
+      .steps-section, .calc-section, .conds-section, .form-section { padding: 72px 40px; }
+      .section-title { font-size: 32px; text-align: center; letter-spacing: -1px; }
+      .section-subtitle { font-size: 16px; text-align: center; margin-bottom: 36px; }
+
+      /* ШАГИ — 4 колонки */
+      .steps-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+      .step-item { flex-direction: column; gap: 14px; background: #fff; border: 1px solid var(--border);
+        border-radius: var(--radius-xl); padding: 26px 24px; }
+      .step-title { font-size: 16px; }
+      .step-desc { font-size: 14px; }
+
+      /* КАЛЬКУЛЯТОР */
+      .calc-card { max-width: 780px; padding: 32px 32px; }
+      .segment-btn { font-size: 14px; padding: 14px 10px; }
+      .tariff-conds-inner { padding: 14px 18px; }
+      .tc-item { font-size: 13px; padding: 3px 0; }
+      .field-wrap, .months-control { margin-bottom: 20px; }
+      .input-box input, .prepay-input-wrap input { padding: 15px 52px 15px 18px; font-size: 18px; }
+      .field-label { font-size: 14px; }
+      .divider { margin: 22px 0; }
+      .results-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+      .result-card { padding: 18px 20px; }
+      .result-card.highlight .result-card-value { font-size: 26px; }
+      .result-card-value { font-size: 23px; }
+      .result-card-label { font-size: 11px; }
+      .calc-wa-btn { max-width: 380px; margin: 22px auto 0; font-size: 16px; padding: 16px; }
+
+      /* УСЛОВИЯ — 3 колонки */
+      .conds-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .cond-card { padding: 26px 24px; border-radius: var(--radius-xl); }
+      .cond-icon { width: 44px; height: 44px; border-radius: 13px; margin-bottom: 14px; }
+      .cond-title { font-size: 16px; margin-bottom: 5px; }
+      .cond-desc { font-size: 14px; }
+
+      /* ФОРМА */
+      .form-section::before { width: 340px; height: 340px; top: -120px; right: -60px; }
+      .form-title { font-size: 32px; text-align: center; }
+      .form-subtitle { font-size: 16px; text-align: center; margin-bottom: 32px; }
+      .form-fields { max-width: 560px; }
+      .form-input { padding: 16px 18px; font-size: 16px; }
+      .form-btn { font-size: 16px; padding: 17px; }
+
+      /* ФУТЕР */
+      .site-footer { padding: 40px 40px 36px; }
+      .footer-brand { font-size: 17px; }
+      .footer-tagline { font-size: 12px; }
+
+      /* ЛИЧНЫЙ КАБИНЕТ */
+      .contract-page { max-width: 760px; margin: 0 auto; padding-bottom: 60px; }
+      .login-card { max-width: 480px; margin: 32px auto 0; padding: 32px; }
+      .login-title { font-size: 24px; }
+      .dash-stats { grid-template-columns: repeat(3, 1fr); margin: 24px 0 0; }
+      .dash-card { margin: 14px 0; padding: 24px; }
+      .refresh-btn, .logout-btn { width: 100%; margin-left: 0; margin-right: 0; }
+      .refresh-btn { margin-bottom: 10px; }
+
+      /* меню-дропдаун — компактное справа */
+      .drawer { left: auto; right: 40px; width: 280px; top: 72px; border-radius: 0 0 16px 16px; }
     }
   </style>
 </head>
@@ -390,6 +486,10 @@
       </div>
     </div>
     <div class="header-actions">
+      <nav class="header-nav">
+        <a id="nav-calc" class="active" onclick="switchPage('calc')">Главная</a>
+        <a id="nav-contract" onclick="switchPage('contract')">Личный кабинет</a>
+      </nav>
       <a class="header-icon" href="tel:+79280222114" aria-label="Позвонить">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
       </a>
@@ -416,13 +516,12 @@
       <div class="hero-line"></div>
       <div class="hero-inner">
         <div class="hero-text">
-          <div class="hero-title">Рассрочка<br>по нормам <em>ислама</em></div>
+          <div class="hero-title">Рассрочка<br>по нормам <span class="nowrap"><em>ислама</em> по ЧР</span></div>
         </div>
       </div>
-      <div class="hero-chips">
-        <div class="hero-chip">До 1 500 000 ₽</div>
-        <div class="hero-chip">3–12 месяцев</div>
-        <div class="hero-chip">Без скрытых %</div>
+      <div class="hero-cta">
+        <a class="hero-btn hero-btn-primary" href="#calc">Рассчитать рассрочку</a>
+        <a class="hero-btn hero-btn-ghost" href="#form">Оставить заявку</a>
       </div>
     </section>
 
@@ -463,7 +562,7 @@
     </section>
 
     <!-- CALCULATOR -->
-    <section class="calc-section">
+    <section class="calc-section" id="calc">
       <div class="section-title">Калькулятор рассрочки</div>
       <div class="section-subtitle">Подберите удобные условия</div>
       <div class="calc-card">
@@ -493,7 +592,7 @@
             <span class="input-currency">₽</span>
           </div>
           <div class="field-error" id="priceError">Стоимость товара должна быть не менее 30 000₽</div>
-          <input type="range" id="priceSlider" class="sber-slider" min="30000" max="1500000" value="30000" step="1000" style="margin-top:10px" />
+          <input type="range" id="priceSlider" class="sber-slider" min="30000" max="1500000" value="30000" step="1000" style="margin-top:8px" />
         </div>
         <div class="months-control">
           <div class="field-label">Срок рассрочки <span class="field-hint" id="monthsValue">3 месяца</span></div>
@@ -519,14 +618,14 @@
         <div class="divider"></div>
         <div class="section-label">Расчёт рассрочки</div>
         <div class="results-grid">
+          <div class="result-card">
+            <div class="result-card-label">Первый взнос</div>
+            <div class="result-card-value" id="resPrepay">0 ₽</div>
+          </div>
           <div class="result-card highlight">
             <div class="result-card-label">Ежемесячный платёж</div>
             <div class="result-card-value" id="resMonthly">0 ₽</div>
             <div class="result-card-sub" id="resMonthsSub">— мес</div>
-          </div>
-          <div class="result-card">
-            <div class="result-card-label">Первый взнос</div>
-            <div class="result-card-value" id="resPrepay">0 ₽</div>
           </div>
           <div class="result-card">
             <div class="result-card-label">Итоговая стоимость</div>
@@ -538,6 +637,7 @@
             <div class="result-card-sub" id="resMarkupPct">0%</div>
           </div>
         </div>
+        <a id="whatsappBtn" class="calc-wa-btn" href="#" target="_blank"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.054 23.25a.75.75 0 00.916.916l5.395-1.478A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.71 9.71 0 01-4.951-1.355l-.355-.212-3.684 1.008 1.008-3.684-.212-.355A9.71 9.71 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg> Оформить в WhatsApp</a>
       </div>
     </section>
 
@@ -580,7 +680,7 @@
     </section>
 
     <!-- APPLICATION FORM -->
-    <section class="form-section">
+    <section class="form-section" id="form">
       <div class="form-title">Оставить заявку</div>
       <div class="form-subtitle">Ответим в течение 15 минут</div>
       <div class="form-fields">
@@ -636,18 +736,6 @@
       </div>
     </div>
   </div>
-  <!-- STICKY BAR -->
-  <div class="sticky-bar" id="stickyBar">
-    <div class="sticky-info">
-      <div class="sticky-label">Ежемесячный платёж</div>
-      <div class="sticky-amount" id="stickyMonthly">— ₽</div>
-    </div>
-    <a id="whatsappBtn" class="sticky-wa-btn" href="#" target="_blank">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.054 23.25a.75.75 0 00.916.916l5.395-1.478A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.71 9.71 0 01-4.951-1.355l-.355-.212-3.684 1.008 1.008-3.684-.212-.355A9.71 9.71 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/></svg>
-      Оформить
-    </a>
-  </div>
-
   <!-- ═══════════ СТРАНИЦА «МОЙ ДОГОВОР» ═══════════ -->
   <div class="page" id="page-contract">
     <div class="contract-page" style="padding-top:16px">
@@ -712,7 +800,6 @@
   const priceError = document.getElementById('priceError');
   const priceSlider = document.getElementById('priceSlider');
   const whatsappBtn = document.getElementById('whatsappBtn');
-  const stickyMonthly = document.getElementById('stickyMonthly');
   const resMonthly = document.getElementById('resMonthly');
   const resMonthsSub = document.getElementById('resMonthsSub');
   const resPrepay = document.getElementById('resPrepay');
@@ -891,7 +978,7 @@
       prepayError.classList.remove('visible');
       Object.keys(_counters).forEach(k => delete _counters[k]);
       togglePrepay(selectedTariff === 'with');
-      whatsappBtn.href = 'https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.';
+      whatsappBtn.href = 'https://wa.me/79280222114?text=' + encodeURIComponent('Ас-саляму алейкум, хочу оформить рассрочку.');
       return;
     }
     if (price < limits.min || price > limits.max) {
@@ -907,7 +994,7 @@
       prepayError.classList.remove('visible');
       Object.keys(_counters).forEach(k => delete _counters[k]);
       togglePrepay(selectedTariff === 'with');
-      whatsappBtn.href = 'https://wa.me/79280222114?text=Здравствуйте, хочу оформить рассрочку.';
+      whatsappBtn.href = 'https://wa.me/79280222114?text=' + encodeURIComponent('Ас-саляму алейкум, хочу оформить рассрочку.');
       return;
     }
     priceError.classList.remove('visible');
@@ -942,18 +1029,16 @@
     setVal(resFinal, fmt(finalCost));
     setVal(resMarkup, fmt(markup));
     setVal(resMarkupPct, markupPct.toFixed(1) + '%');
-    if (stickyMonthly) stickyMonthly.textContent = fmt(monthly);
-    const tariffLabel = selectedTariff === 'with' ? 'С первым взносом' : 'Без первого взноса';
     const msgLines = [
-      '*Здравствуйте, хочу оформить рассрочку*',
-      `- Стоимость товара: *${price.toLocaleString('ru-RU')} ₽*`,
-      `- Тариф: *${tariffLabel}*`,
-      `- Срок: *${months} ${monthWord(months)}*`,
-      '', '     *Расчёт:*',
-      ...(selectedTariff === 'with' ? [`- Первый взнос: *${prepayment.toLocaleString('ru-RU')} ₽*`] : []),
-      `- Ежемесячный платёж: *${monthly.toLocaleString('ru-RU')} ₽*`,
-      `- Итоговая стоимость: *${finalCost.toLocaleString('ru-RU')} ₽*`,
-      `- Наценка: *${markup.toLocaleString('ru-RU')} ₽ (${markupPct.toFixed(1)}%)*`,
+      'Ас-саляму алейкум, хочу оформить рассрочку.',
+      '',
+      `Стоимость товара - *${price.toLocaleString('ru-RU')} ₽*`,
+      `Срок - *${months}* мес.`,
+      '',
+      (selectedTariff === 'with' ? `Первый взнос - *${prepayment.toLocaleString('ru-RU')} ₽*` : 'Без первого взноса'),
+      `Ежемесячный платеж - *${monthly.toLocaleString('ru-RU')} ₽*`,
+      `Итоговая стоимость - *${finalCost.toLocaleString('ru-RU')} ₽*`,
+      `Наценка - *${markup.toLocaleString('ru-RU')} ₽ (${markupPct.toFixed(1)}%)*`,
     ];
     whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(msgLines.join('\n'))}`;
   }
@@ -1011,7 +1096,6 @@
     document.querySelectorAll('.drawer-item').forEach(n => n.classList.remove('active'));
     const di = document.getElementById('drawer-' + page);
     if (di) di.classList.add('active');
-    document.getElementById('stickyBar').style.display = page === 'calc' ? 'flex' : 'none';
     document.getElementById('drawerOverlay').classList.remove('open');
     window.scrollTo(0, 0);
   }
@@ -1126,6 +1210,48 @@
   const wrapper = document.querySelector('.app-wrapper');
   document.fonts.ready.then(() => wrapper.classList.add('fonts-loaded'));
   setTimeout(() => wrapper.classList.add('fonts-loaded'), 800);
+
+  // ─── ССЫЛКИ-АНКОРЫ: #lk (личный кабинет), #calc, #form ───
+  (function() {
+    var _switch = switchPage;
+    switchPage = function(page) {
+      _switch(page);
+      try {
+        if (page === 'contract') history.replaceState(null, '', '#lk');
+        else history.replaceState(null, '', location.pathname + location.search);
+      } catch (e) {}
+      var links = document.querySelectorAll('.header-nav a');
+      for (var i = 0; i < links.length; i++) links[i].classList.remove('active');
+      var nl = document.getElementById(page === 'contract' ? 'nav-contract' : 'nav-calc');
+      if (nl) nl.classList.add('active');
+    };
+    // плавная прокрутка по клику на анкорные ссылки
+    document.addEventListener('click', function(e) {
+      var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+      if (!a) return;
+      var id = a.getAttribute('href');
+      if (id === '#' || id.length < 2) return;
+      var target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      if (!document.getElementById('page-calc').classList.contains('active')) switchPage('calc');
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      try { history.replaceState(null, '', id); } catch (err) {}
+    });
+
+    function applyHash() {
+      var h = (location.hash || '').toLowerCase();
+      if (h === '#lk' || h === '#cabinet' || h === '#contract') {
+        switchPage('contract');
+      } else if (h === '#calc' || h === '#form') {
+        if (!document.getElementById('page-calc').classList.contains('active')) switchPage('calc');
+        var t = document.querySelector(h);
+        if (t) setTimeout(function() { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+      }
+    }
+    window.addEventListener('hashchange', applyHash);
+    applyHash();
+  })();
 
   // ─── DRAWER ───
   function toggleDrawer() {
