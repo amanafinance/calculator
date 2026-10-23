@@ -1221,6 +1221,37 @@
       var nl = document.getElementById(page === 'contract' ? 'nav-contract' : 'nav-calc');
       if (nl) nl.classList.add('active');
     };
+    // плавная прокрутка своей анимацией: встроенная в браузеры слишком резкая,
+    // а во встроенном браузере Instagram может и вовсе прыгать
+    var scrollAnim = 0;
+    function smoothScrollTo(target) {
+      var root = document.documentElement;
+      var margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      var maxY = root.scrollHeight - window.innerHeight;
+      var to = Math.max(0, Math.min(maxY, target.getBoundingClientRect().top + window.pageYOffset - margin));
+      var from = window.pageYOffset, dist = to - from;
+      cancelAnimationFrame(scrollAnim);
+      if (Math.abs(dist) < 2) return;
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, to); return; }
+      var duration = Math.min(1100, Math.max(550, 380 + Math.abs(dist) * 0.3));
+      var ease = function(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+      var start = null;
+      root.style.scrollBehavior = 'auto';     // иначе CSS-плавность наложится на каждый кадр
+      function stop() {
+        cancelAnimationFrame(scrollAnim);
+        root.style.scrollBehavior = '';
+        window.removeEventListener('wheel', stop); window.removeEventListener('touchstart', stop);
+      }
+      // если человек сам начал листать — не мешаем
+      window.addEventListener('wheel', stop, { passive: true }); window.addEventListener('touchstart', stop, { passive: true });
+      scrollAnim = requestAnimationFrame(function step(now) {
+        if (start === null) start = now;
+        var t = Math.min(1, (now - start) / duration);
+        window.scrollTo(0, from + dist * ease(t));
+        if (t < 1) scrollAnim = requestAnimationFrame(step); else stop();
+      });
+    }
+
     // плавная прокрутка по клику на анкорные ссылки
     document.addEventListener('click', function(e) {
       var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
@@ -1231,7 +1262,7 @@
       if (!target) return;
       e.preventDefault();
       if (!document.getElementById('page-calc').classList.contains('active')) switchPage('calc');
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      smoothScrollTo(target);
       try { history.replaceState(null, '', id); } catch (err) {}
     });
 
@@ -1242,7 +1273,7 @@
       } else if (h === '#calc' || h === '#form') {
         if (!document.getElementById('page-calc').classList.contains('active')) switchPage('calc');
         var t = document.querySelector(h);
-        if (t) setTimeout(function() { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+        if (t) setTimeout(function() { smoothScrollTo(t); }, 60);
       }
     }
     window.addEventListener('hashchange', applyHash);
