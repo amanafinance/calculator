@@ -1142,7 +1142,7 @@
       '<div class="dash-stat" style="' + (overdueSum > 0 ? 'border:2px solid #e84245' : '') + '"><div class="dash-stat-label" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">Просрочка</div><div class="dash-stat-value" style="' + (overdueSum > 0 ? 'color:#e84245' : '') + '">' + fmtNum(overdueSum) + ' ₽</div><div class="dash-stat-sub">' + (overdueSum > 0 ? 'Требует оплаты' : 'Просрочек нет') + '</div></div>' +
       '<div class="dash-stat"><div class="dash-stat-label">Оплачено</div><div class="dash-stat-value">' + paidCount + ' из ' + payments.length + '</div><div class="dash-stat-sub">платежей</div></div>';
     document.getElementById('dashInfo').innerHTML =
-      '<div class="dash-card-title">Договор ' + data.contract + '</div>' +
+      '<div class="dash-card-title">Договор ' + esc(data.contract) + '</div>' +
       row('Клиент', data.name) +
       (data.guarantor ? row('Поручитель', data.guarantor) : '') +
       row('Товар', data.product) +
@@ -1157,7 +1157,7 @@
       else if (p.status === 'частично') { dotClass = 'overdue'; statusLabel = 'Частично просрочен (' + fmtNum(p.amount - p.paid) + ' из ' + fmtNum(p.amount) + ' ₽)'; }
       else if (p.status === 'просрочен') { dotClass = 'overdue'; statusLabel = 'Просрочен'; }
       else { dotClass = 'upcoming'; statusLabel = 'Ожидается'; }
-      html += '<div class="payment-row"><div class="payment-dot ' + dotClass + '"></div><div class="payment-info"><div class="payment-month">' + p.month + '</div></div><div class="payment-right"><div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div><div class="payment-status ' + dotClass + '">' + statusLabel + '</div></div></div>';
+      html += '<div class="payment-row"><div class="payment-dot ' + dotClass + '"></div><div class="payment-info"><div class="payment-month">' + esc(p.month) + '</div></div><div class="payment-right"><div class="payment-amount">' + fmtNum(p.amount) + ' ₽</div><div class="payment-status ' + dotClass + '">' + statusLabel + '</div></div></div>';
     });
     document.getElementById('paymentsList').innerHTML = html || '<div style="color:#9ba4a8;font-size:13px;padding:10px 0">Платежей нет</div>';
   }
@@ -1193,7 +1193,11 @@
   }
 
   function row(label, val) {
-    return '<div class="dash-info-row"><span class="dash-info-label">' + label + '</span><span class="dash-info-value">' + (val || '—') + '</span></div>';
+    return '<div class="dash-info-row"><span class="dash-info-label">' + label + '</span><span class="dash-info-value">' + esc(val || '—') + '</span></div>';
+  }
+  // данные из таблицы вставляем как текст, а не как HTML
+  function esc(v) {
+    return String(v).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
   }
   function fmtNum(n) { return (parseFloat(n) || 0).toLocaleString('ru-RU'); }
 
