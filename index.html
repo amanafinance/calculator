@@ -778,10 +778,12 @@
 
   // ═══ ДАННЫЕ ТАРИФОВ ═══
   const markupWithDown     = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
-  const markupWithoutDown  = {3:13,4:17,5:21,6:25.5,7:28.5,8:32,9:35,10:38,11:41.5,12:45};
-  const markupNoDownPayment= {3:14,4:18,5:23,6:28,7:31,8:34,9:37,10:40,11:43,12:46};
+  const markupWithoutDown  = {3:12,4:16,5:20,6:24,7:26.5,8:29.5,9:32,10:34.5,11:37.5,12:40};
+  const markupNoDownPayment= {3:13,4:17,5:21,6:25,7:27.5,8:30.5,9:33,10:35.5,11:38.5,12:41};
   const tariffLimits = { with: {min:30000,max:1500000,label:'от 30 000 до 1 500 000 ₽'}, without: {min:30000,max:300000,label:'от 30 000 до 300 000 ₽'} };
   const roundUpTo100 = v => Math.ceil(v / 100) * 100;
+  // Стандартный первый взнос — 25% от себестоимости, с округлением до 100 ₽ вверх.
+  const getDefaultPrepay = price => roundUpTo100(price * 0.25);
   const fmt = v => v.toLocaleString('ru-RU') + ' ₽';
   let selectedTariff = 'with';
 
@@ -838,7 +840,7 @@
   prepaySlider.addEventListener('input', () => {
     const min = parseInt(prepaySlider.min);
     const max = parseInt(prepaySlider.max);
-    const defaultPrepay = roundUpTo100((parseInt(priceEl.value.replace(/\D/g,'')) || 0) * (1 + (selectedTariff === 'with' ? markupWithDown[parseInt(monthsEl.value)] : 0) / 100) * 0.25);
+    const defaultPrepay = getDefaultPrepay(parseInt(priceEl.value.replace(/\D/g,'')) || 0);
     const val = parseInt(prepaySlider.value);
     const magnetZone = Math.round((max - min) * 0.04);
     if (Math.abs(val - defaultPrepay) <= magnetZone) {
@@ -873,8 +875,7 @@
     const oldLen = prepayInput.value.length;
     let val = roundUpTo100(num);
     const priceRaw = parseInt(priceEl.value.replace(/\D/g, '')) || 0;
-    const months = parseInt(monthsEl.value);
-    const defaultPrepay = roundUpTo100(priceRaw * (1 + markupWithDown[months] / 100) * 0.25);
+    const defaultPrepay = getDefaultPrepay(priceRaw);
     const magnetZone = Math.round((max - min) * 0.04);
     if (Math.abs(val - defaultPrepay) <= magnetZone) val = defaultPrepay;
     const formatted = val.toLocaleString('ru-RU');
@@ -1001,7 +1002,7 @@
     if (selectedTariff === 'with') {
       const minPrepay = roundUpTo100(baseFinalCost * 0.15);
       const maxPrepay = price < 100000 ? roundUpTo100(baseFinalCost * 0.25) : roundUpTo100(baseFinalCost * 0.65);
-      const defaultPrepay = roundUpTo100(baseFinalCost * 0.25);
+      const defaultPrepay = getDefaultPrepay(price);
       prepaySlider.min = minPrepay; prepaySlider.max = maxPrepay;
       if (resetPrepay) { prepaySlider.value = defaultPrepay; prepayInput.value = defaultPrepay.toLocaleString('ru-RU'); prepayError.classList.remove('visible'); }
       updateSliderFill(prepaySlider);
@@ -1294,3 +1295,4 @@
 </script>
 </body>
 </html>
+
