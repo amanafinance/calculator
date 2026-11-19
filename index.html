@@ -1001,7 +1001,7 @@
     let prepayment = 0, monthly = 0, finalCost = 0;
     if (selectedTariff === 'with') {
       const minPrepay = roundUpTo100(baseFinalCost * 0.15);
-      const maxPrepay = price < 100000 ? roundUpTo100(baseFinalCost * 0.25) : roundUpTo100(baseFinalCost * 0.65);
+      const maxPrepay = price <= 100000 ? getDefaultPrepay(price) : roundUpTo100(baseFinalCost * 0.65);
       const defaultPrepay = getDefaultPrepay(price);
       prepaySlider.min = minPrepay; prepaySlider.max = maxPrepay;
       if (resetPrepay) { prepaySlider.value = defaultPrepay; prepayInput.value = defaultPrepay.toLocaleString('ru-RU'); prepayError.classList.remove('visible'); }
