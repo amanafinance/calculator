@@ -582,13 +582,13 @@
           <div class="tc-item">Прописка в ЧР</div>
         </div></div>
         <div class="field-wrap">
-          <div class="field-label">Стоимость товара <span class="field-hint" id="priceHint">от 30 000 до 1 500 000 ₽</span></div>
+          <div class="field-label">Стоимость товара <span class="field-hint" id="priceHint">от 20 000 до 1 500 000 ₽</span></div>
           <div class="input-box">
-            <input type="text" inputmode="numeric" id="price" placeholder="0" autocomplete="off" value="30 000" />
+            <input type="text" inputmode="numeric" id="price" placeholder="0" autocomplete="off" value="20 000" />
             <span class="input-currency">₽</span>
           </div>
-          <div class="field-error" id="priceError">Стоимость товара должна быть не менее 30 000₽</div>
-          <input type="range" id="priceSlider" class="sber-slider" min="30000" max="1500000" value="30000" step="1000" style="margin-top:8px" />
+          <div class="field-error" id="priceError">Стоимость товара должна быть не менее 20 000₽</div>
+          <input type="range" id="priceSlider" class="sber-slider" min="20000" max="1500000" value="20000" step="1000" style="margin-top:8px" />
         </div>
         <div class="months-control">
           <div class="field-label">Срок рассрочки <span class="field-hint" id="monthsValue">3 месяца</span></div>
@@ -780,7 +780,7 @@
   const markupWithDown     = {3:9,4:12,5:15,6:18,7:20,8:22,9:24,10:26,11:28,12:30};
   const markupWithoutDown  = {3:12,4:16,5:20,6:24,7:26.5,8:29.5,9:32,10:34.5,11:37.5,12:40};
   const markupNoDownPayment= {3:13,4:17,5:21,6:25,7:27.5,8:30.5,9:33,10:35.5,11:38.5,12:41};
-  const tariffLimits = { with: {min:30000,max:1500000,label:'от 30 000 до 1 500 000 ₽'}, without: {min:30000,max:300000,label:'от 30 000 до 300 000 ₽'} };
+  const tariffLimits = { with: {min:20000,max:1500000,label:'от 20 000 до 1 500 000 ₽'}, without: {min:20000,max:300000,label:'от 20 000 до 300 000 ₽'} };
   const roundUpTo100 = v => Math.ceil(v / 100) * 100;
   // Стандартный первый взнос — 25% от себестоимости, с округлением до 100 ₽ вверх.
   const getDefaultPrepay = price => roundUpTo100(price * 0.25);
