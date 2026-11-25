@@ -132,7 +132,7 @@
 
     /* ─── СТРАНИЦЫ ─── */
     .page { display: none; }
-    #calc, #form { scroll-margin-top: 64px; }
+    #calc { scroll-margin-top: 64px; }
     .page.active { display: block; }
     #page-calc { padding-top: 60px; padding-bottom: 0; }
     #page-contract { padding-top: 60px; padding-bottom: 40px; }
@@ -255,35 +255,6 @@
     .cond-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
     .cond-desc { font-size: 13px; color: var(--ink-muted); line-height: 1.4; }
 
-    /* ─── ЗАЯВКА ─── */
-    .form-section { background: var(--night); padding: 44px 20px; position: relative; overflow: hidden; isolation: isolate; }
-    .form-section::before { content: ''; position: absolute; z-index: -1; top: -150px; right: -150px; width: 380px; height: 380px; border-radius: 50%; background: radial-gradient(circle, rgba(162,209,31,0.22) 0%, rgba(162,209,31,0) 68%); }
-    .form-section::after { content: ''; position: absolute; z-index: -1; inset: 0; background: var(--pattern) right bottom / 56px; opacity: 0.4; pointer-events: none;
-      -webkit-mask-image: radial-gradient(90% 55% at 100% 100%, #000 0%, rgba(0,0,0,0.3) 50%, transparent 80%); mask-image: radial-gradient(90% 55% at 100% 100%, #000 0%, rgba(0,0,0,0.3) 50%, transparent 80%); }
-    .form-title { font-size: 26px; font-weight: 700; color: var(--on-night); margin-bottom: 6px; letter-spacing: -0.025em; position: relative; }
-    .form-subtitle { font-size: 15px; color: var(--on-night-muted); margin-bottom: 26px; position: relative; }
-    .form-fields { position: relative; }
-    .form-field { margin-bottom: 14px; }
-    .form-label { font-size: 12px; font-weight: 700; color: var(--on-night-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: block; }
-    .form-input {
-      width: 100%; padding: 14px 16px; font-family: var(--font-text); font-size: 16px; font-weight: 600;
-      color: var(--on-night); background: var(--night-raised); border: 1.5px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-sm); outline: none; transition: border-color 0.2s var(--ease-out); -webkit-appearance: none;
-    }
-    .form-input::placeholder { color: rgba(242,245,238,0.35); }
-    .form-input:focus { border-color: var(--lime); }
-    .form-btn {
-      width: 100%; padding: 16px; border-radius: var(--radius-md); background: var(--lime); color: var(--ink);
-      font-family: var(--font-text); font-size: 16px; font-weight: 700; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; transition: transform 0.16s var(--ease-out), background 0.2s var(--ease-out);
-    }
-    .form-btn:hover { background: #b0dc35; }
-    .form-btn:active { transform: scale(0.98); }
-    .form-btn:disabled { opacity: 0.6; cursor: default; }
-    .form-msg { margin-top: 12px; font-size: 14px; font-weight: 600; text-align: center; min-height: 18px; position: relative; }
-    .form-msg.success { color: var(--lime); }
-    .form-msg.error { color: #f97066; }
-
     /* ─── ПОДВАЛ ─── */
     .site-footer { background: var(--night); border-top: 1px solid rgba(255,255,255,0.06); padding: 28px 20px 24px; text-align: center; }
     .footer-brand { font-family: var(--font-logo); font-size: 15px; font-weight: 700; color: var(--on-night); letter-spacing: 0.22em; margin-bottom: 6px; }
@@ -379,7 +350,7 @@
       .hero-title { font-size: 30px; }
       .result-card-value { font-size: 16px; }
       .header-company-top, .header-company-bot { font-size: 11px; letter-spacing: 0.18em; }
-      .steps-section, .calc-section, .conds-section, .form-section { padding-left: 16px; padding-right: 16px; }
+      .steps-section, .calc-section, .conds-section { padding-left: 16px; padding-right: 16px; }
     }
 
     /* планшеты: колонка-приложение */
@@ -402,10 +373,10 @@
       .hamburger-btn { display: none; }
       .header-icon { width: 38px; height: 38px; }
       #page-calc, #page-contract { padding-top: 72px; }
-      #calc, #form { scroll-margin-top: 80px; }
+      #calc { scroll-margin-top: 80px; }
 
       .hero-inner, .hero-cta,
-      .steps-section > *, .calc-section > *, .conds-section > *, .form-section > * {
+      .steps-section > *, .calc-section > *, .conds-section > * {
         max-width: 1140px; margin-left: auto; margin-right: auto;
       }
       .hero-section { padding: 88px 40px 80px; }
@@ -416,7 +387,7 @@
       .hero-cta { flex-direction: row; gap: 12px; margin-top: 32px; }
       .hero-btn { width: auto; padding: 17px 30px; font-size: 16px; }
 
-      .steps-section, .calc-section, .conds-section, .form-section { padding: 80px 40px; }
+      .steps-section, .calc-section, .conds-section { padding: 80px 40px; }
       .calc-section, .conds-section { padding-top: 24px; }
       .section-title { font-size: 40px; text-align: center; letter-spacing: -0.03em; }
       .section-subtitle { font-size: 17px; text-align: center; margin-bottom: 40px; }
@@ -446,13 +417,6 @@
       .cond-icon { width: 48px; height: 48px; margin-bottom: 16px; }
       .cond-title { font-size: 17px; margin-bottom: 5px; }
       .cond-desc { font-size: 15px; }
-
-      .form-section::after { background-size: 64px; -webkit-mask-image: radial-gradient(40% 80% at 100% 100%, #000 0%, rgba(0,0,0,0.3) 50%, transparent 85%), radial-gradient(40% 80% at 0% 0%, rgba(0,0,0,0.6) 0%, transparent 80%); mask-image: radial-gradient(40% 80% at 100% 100%, #000 0%, rgba(0,0,0,0.3) 50%, transparent 85%), radial-gradient(40% 80% at 0% 0%, rgba(0,0,0,0.6) 0%, transparent 80%); }
-      .form-title { font-size: 40px; text-align: center; letter-spacing: -0.03em; }
-      .form-subtitle { font-size: 17px; text-align: center; margin-bottom: 36px; }
-      .form-fields { max-width: 560px; }
-      .form-input { padding: 16px 18px; }
-      .form-btn { font-size: 17px; padding: 18px; }
 
       .site-footer { padding: 44px 40px 40px; }
       .footer-brand { font-size: 17px; }
@@ -517,7 +481,7 @@
       </div>
       <div class="hero-cta">
         <a class="hero-btn hero-btn-primary" href="#calc">Рассчитать рассрочку <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a class="hero-btn hero-btn-ghost" href="#form">Оставить заявку</a>
+        <a class="hero-btn hero-btn-ghost" href="https://wa.me/79280222114?text=%D0%90%D1%81-%D1%81%D0%B0%D0%BB%D1%8F%D0%BC%D1%83%20%D0%B0%D0%BB%D0%B5%D0%B9%D0%BA%D1%83%D0%BC%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BE%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D1%81%D1%80%D0%BE%D1%87%D0%BA%D1%83." target="_blank" rel="noopener noreferrer">Оставить заявку</a>
       </div>
     </section>
 
@@ -544,7 +508,7 @@
           <div class="step-number">3</div>
           <div class="step-content">
             <div class="step-title">Подайте заявку</div>
-            <div class="step-desc">Через WhatsApp или форму ниже — ответим в течение 15 минут</div>
+            <div class="step-desc">Через WhatsApp — ответим в течение 15 минут</div>
           </div>
         </div>
         <div class="step-item">
@@ -672,30 +636,6 @@
           <div class="cond-title">С/без взноса</div>
           <div class="cond-desc">Два тарифа на выбор</div>
         </div>
-      </div>
-    </section>
-
-    <!-- APPLICATION FORM -->
-    <section class="form-section" id="form">
-      <div class="form-title">Оставить заявку</div>
-      <div class="form-subtitle">Ответим в течение 15 минут</div>
-      <div class="form-fields">
-        <div class="form-field">
-          <label class="form-label" for="formName">Ваше имя</label>
-          <input class="form-input" type="text" id="formName" placeholder="Ахмад" autocomplete="off" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="formPhone">Номер телефона</label>
-          <input class="form-input" type="tel" id="formPhone" placeholder="+7 900 000-00-00" autocomplete="off" />
-        </div>
-        <div class="form-field">
-          <label class="form-label" for="formProduct">Что хотите купить?</label>
-          <input class="form-input" type="text" id="formProduct" placeholder="Например: кирпич, холодильник..." autocomplete="off" />
-        </div>
-        <button class="form-btn" id="formSubmitBtn" onclick="sendFormToSheet()">
-          Отправить заявку
-        </button>
-        <div class="form-msg" id="formMsg"></div>
       </div>
     </section>
 
@@ -1040,52 +980,6 @@
     whatsappBtn.href = `https://wa.me/79280222114?text=${encodeURIComponent(msgLines.join('\n'))}`;
   }
 
-  // ═══ ФОРМА ЗАЯВКИ ═══
-  // URL веб-приложения Google Apps Script для заявок (вставь свой после деплоя)
-  const LEADS_URL = 'https://script.google.com/macros/s/AKfycbx8qMtPluGGBZ3QRYdtix5N8uK9xW2GNP8CMWX9bmMAk2r8zYx-XmYvw1djpkolE2MZxQ/exec';
-
-  function sendFormToSheet() {
-    const name = document.getElementById('formName').value.trim();
-    const phone = document.getElementById('formPhone').value.trim();
-    const product = document.getElementById('formProduct').value.trim();
-    const btn = document.getElementById('formSubmitBtn');
-    const msg = document.getElementById('formMsg');
-    msg.className = 'form-msg';
-    msg.textContent = '';
-
-    if (!name || phone.replace(/\D/g, '').length < 10) {
-      msg.className = 'form-msg error';
-      msg.textContent = 'Укажите имя и корректный номер телефона';
-      return;
-    }
-
-    btn.disabled = true;
-    const originalText = btn.textContent;
-    btn.textContent = 'Отправка...';
-
-    fetch(LEADS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ name: name, phone: phone, product: product })
-    })
-    .then(function() {
-      msg.className = 'form-msg success';
-      msg.textContent = '✓ Заявка отправлена! Скоро свяжемся с вами';
-      document.getElementById('formName').value = '';
-      document.getElementById('formPhone').value = '';
-      document.getElementById('formProduct').value = '';
-      btn.textContent = originalText;
-      btn.disabled = false;
-    })
-    .catch(function() {
-      msg.className = 'form-msg error';
-      msg.textContent = 'Ошибка отправки. Попробуйте ещё раз';
-      btn.textContent = originalText;
-      btn.disabled = false;
-    });
-  }
-
   // ═══ НАВИГАЦИЯ ═══
   function switchPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1212,7 +1106,7 @@
   document.fonts.ready.then(() => wrapper.classList.add('fonts-loaded'));
   setTimeout(() => wrapper.classList.add('fonts-loaded'), 800);
 
-  // ─── ССЫЛКИ-АНКОРЫ: #lk (личный кабинет), #calc, #form ───
+  // ─── ССЫЛКИ-АНКОРЫ: #lk (личный кабинет), #calc ───
   (function() {
     var _switch = switchPage;
     switchPage = function(page) {
@@ -1273,9 +1167,10 @@
 
     function applyHash() {
       var h = (location.hash || '').toLowerCase();
+      if (h === '#form') h = '#calc';
       if (h === '#lk' || h === '#cabinet' || h === '#contract') {
         switchPage('contract');
-      } else if (h === '#calc' || h === '#form') {
+      } else if (h === '#calc') {
         if (!document.getElementById('page-calc').classList.contains('active')) switchPage('calc');
         var t = document.querySelector(h);
         if (t) setTimeout(function() { smoothScrollTo(t); }, 60);
